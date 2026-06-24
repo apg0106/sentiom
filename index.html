@@ -559,6 +559,16 @@ async function addTx(){
     transactions.unshift(tx)
     document.getElementById('tx-merchant').value=''
     document.getElementById('tx-amount').value=''
+    if(t==='gas'||t==='groceries'||t==='free-spend'){
+      const billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Free Cash'
+      const bill=bills.find(b=>b.name===billName)
+      if(bill){
+        const currentActual=billActuals[bill.id]||0
+        const newActual=parseFloat((currentActual+a).toFixed(2))
+        billActuals[bill.id]=newActual
+        await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
+      }
+    }
     showToast('Transaction logged')
     renderAll()
   }catch(e){showToast('Could not save',true)}
