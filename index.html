@@ -391,6 +391,9 @@ function renderAll(){renderDash();renderIncome();renderBills();renderTx();render
 // ── DASHBOARD ────────────────────────────────────────────────────
 function renderDash(){
   const totalInc=incomeLog.reduce((s,i)=>s+i.amount,0)
+  const billsPaid=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:0),0)
+  const allTx=transactions.reduce((s,t)=>s+t.amount,0)
+  const ledger=totalInc-billsPaid-allTx
   const estBills=bills.reduce((s,b)=>s+b.est,0)
   const actBills=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0)
   const offAmt=transactions.filter(t=>t.type==='off-budget').reduce((s,t)=>s+t.amount,0)
