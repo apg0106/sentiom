@@ -55,8 +55,6 @@ input::placeholder{color:#6B6D69}
 .badge-b{background:#0A2018;color:#1D9E75;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-o{background:#2A0A0A;color:#E24B4A;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-f{background:#1A1400;color:#EF9F27;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
-.badge-g{background:#0A1A0A;color:#5DC85D;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
-.badge-gr{background:#1A0A1A;color:#C85DC8;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-i{background:#0A1A2A;color:#378ADD;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .log-entry{font-size:12px;color:#9A9C99;padding:5px 0;border-bottom:0.5px solid #1A1D1B;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .log-entry:last-child{border-bottom:none}
@@ -150,7 +148,20 @@ input::placeholder{color:#6B6D69}
             <div class="ctitle">Spending breakdown</div>
             <div id="dash-spending"><div class="empty">No transactions yet.</div></div>
           </div>
-
+          <div class="card free-card">
+            <div class="ctitle" style="color:#EF9F27">Free Money <span style="font-size:11px;color:#6B6D69;font-weight:400;text-transform:none">monthly fun budget</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <label class="form-label" style="margin:0;white-space:nowrap">Budget:</label>
+              <input type="number" id="free-budget-input" placeholder="e.g. 2000" style="width:100px" oninput="updateFreeBudget(this.value)">
+              <span style="font-size:12px;color:#6B6D69;white-space:nowrap">/ month</span>
+            </div>
+            <div id="dash-free-bar"></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px">
+              <span class="rl">Remaining</span>
+              <span id="dash-free-remaining" style="font-weight:600;font-size:17px;color:#EF9F27">—</span>
+            </div>
+            <div id="dash-free-detail" style="font-size:12px;color:#6B6D69;margin-top:3px;text-align:right"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -181,7 +192,7 @@ input::placeholder{color:#6B6D69}
     <!-- BILLS -->
     <div id="tab-bills" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span style="font-size:12px;color:#6B6D69">Edit est. anytime. Enter actuals each month. Set Free Cash budget by editing its Est. amount.</span>
+        <span style="font-size:12px;color:#6B6D69">Edit est. anytime. Enter actuals each month.</span>
         <button class="btn" onclick="toggleForm('add-bill-form')">+ Add bill</button>
       </div>
       <div id="add-bill-form" style="display:none" class="card">
@@ -219,15 +230,16 @@ input::placeholder{color:#6B6D69}
               <option value="budgeted">Budgeted</option>
               <option value="off-budget">Off-budget</option>
               <option value="free-spend">Free Spend</option>
-              <option value="gas">Gas</option>
-              <option value="groceries">Groceries</option>
             </select>
           </div>
         </div>
         <button class="btn btn-g" onclick="addTx()" style="width:100%;margin-top:4px">Add transaction</button>
       </div>
 
-
+      <div class="card free-card">
+        <div class="ctitle" style="color:#EF9F27">Free Money — <span id="tx-month-label2" style="font-weight:400;text-transform:none;color:#6B6D69"></span></div>
+        <div id="tx-free-summary"><div class="empty" style="font-size:12px">Set a Free Money budget on the Dashboard first.</div></div>
+      </div>
 
       <div class="card">
         <div class="ctitle">All transactions</div>
@@ -270,7 +282,7 @@ input::placeholder{color:#6B6D69}
 const COLORS=['#1D9E75','#BA7517','#378ADD','#7F77DD','#E24B4A','#0F6E56','#854F0B']
 let AUTH='',USER='',OTHER_USER=''
 let viewYear=new Date().getFullYear(),viewMonth=new Date().getMonth()
-let bills=[],billActuals={},goals=[],transactions=[],incomeLog=[]
+let bills=[],billActuals={},goals=[],transactions=[],incomeLog=[],freeBudget=0
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function fmt(n){return'$'+Math.round(n).toLocaleString()}
@@ -343,12 +355,13 @@ async function loadAll(){
   updateMonthLabel()
   try{
     const mk=mKey()
-    const[txData,incData,billData,billActData,goalData]=await Promise.all([
+    const[txData,incData,billData,billActData,goalData,freeData]=await Promise.all([
       api('/transactions?month_key='+mk),
       api('/income?month_key='+mk),
       api('/bills'),
       api('/bill-actuals?month_key='+mk),
       api('/goals'),
+      api('/free-budget?month_key='+mk),
     ])
     transactions=txData
     incomeLog=incData
@@ -356,8 +369,11 @@ async function loadAll(){
     billActuals={}
     billActData.forEach(b=>{billActuals[b.bill_id]=b.actual})
     goals=goalData
+    freeBudget=freeData.amount||0
+    const fb=document.getElementById('free-budget-input')
+    if(fb)fb.value=freeBudget||''
     renderAll()
-  }catch(e){console.error('loadAll error:',e);showToast('Error: '+e.message,true)}
+  }catch(e){showToast('Connection error — check your internet',true)}
 }
 
 // ── TAB ROUTING ──────────────────────────────────────────────────
@@ -374,33 +390,17 @@ function renderAll(){renderDash();renderIncome();renderBills();renderTx();render
 function renderDash(){
   const totalInc=incomeLog.reduce((s,i)=>s+i.amount,0)
   const estBills=bills.reduce((s,b)=>s+b.est,0)
-  // Only subtract bills where actual has been entered
-  const actBillsEntered=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:0),0)
   const actBills=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0)
   const offAmt=transactions.filter(t=>t.type==='off-budget').reduce((s,t)=>s+t.amount,0)
   const budAmt=transactions.filter(t=>t.type==='budgeted').reduce((s,t)=>s+t.amount,0)
   const freeAmt=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
-  const gasAmt=transactions.filter(t=>t.type==='gas').reduce((s,t)=>s+t.amount,0)
-  const grocAmt=transactions.filter(t=>t.type==='groceries').reduce((s,t)=>s+t.amount,0)
-  const allTxAmt=offAmt+budAmt+freeAmt+gasAmt+grocAmt
-  // Ledger = all income - bills actually entered - all transactions
-  const ledgerBalance=totalInc-actBillsEntered-allTxAmt
-  // Free Cash = find Free Cash bill est - free spend transactions
-  const freeCashBill=bills.find(b=>b.name==='Free Cash')
-  const freeCashBudget=freeCashBill?freeCashBill.est:1000
-  const remainingFreeCash=freeCashBudget-freeAmt
   const fs=freeSummary()
 
   document.getElementById('dash-metrics').innerHTML=`
-    <div class="metric" style="grid-column:span 2;background:#0A1A12;border:0.5px solid #1D9E75">
-      <div class="mlabel" style="color:#1D9E75">Ledger balance</div>
-      <div class="mval" style="font-size:28px;color:${ledgerBalance>=0?'#1D9E75':'#E24B4A'}">${fmt(ledgerBalance)}</div>
-      <div style="font-size:11px;color:#6B6D69;margin-top:4px">${fmt(totalInc)} in · ${fmt(actBillsEntered)} bills · ${fmt(allTxAmt)} transactions</div>
-    </div>
     <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
-    <div class="metric"><div class="mlabel">Bills paid</div><div class="mval a">${fmt(actBillsEntered)}</div></div>
+    <div class="metric"><div class="mlabel">Bills (actual)</div><div class="mval a">${fmt(actBills)}</div></div>
     <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
-    <div class="metric" style="background:#1A1400;border:0.5px solid #EF9F27"><div class="mlabel" style="color:#EF9F27">Remaining free cash</div><div class="mval gold">${fmt(remainingFreeCash)}</div><div style="font-size:11px;color:#6B6D69;margin-top:2px">${fmt(freeCashBudget)} budget · ${fmt(freeAmt)} spent</div></div>`
+    <div class="metric"><div class="mlabel">Free spend used</div><div class="mval gold">${fmt(freeAmt)}</div></div>`
 
   const di=document.getElementById('dash-income')
   if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
@@ -445,13 +445,17 @@ function renderDash(){
     det.textContent=`${fmt(fs.spent)} spent of ${fmt(fs.budget)}${fs.over?' — over budget':''}`}
 }
 
-
+async function updateFreeBudget(val){
+  const v=parseFloat(val)
+  if(isNaN(v)||v<0)return
+  freeBudget=v
+  try{await api('/free-budget','POST',{month_key:mKey(),amount:v});renderDash();renderTx()}
+  catch(e){showToast('Could not save budget',true)}
+}
 
 function freeSummary(){
-  const freeCashBill=bills.find(b=>b.name==='Free Cash')
-  const budget=freeCashBill?freeCashBill.est:1000
   const spent=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
-  return{budget,spent,remaining:Math.max(0,budget-spent),over:spent>budget&&budget>0}
+  return{budget:freeBudget,spent,remaining:Math.max(0,freeBudget-spent),over:spent>freeBudget&&freeBudget>0}
 }
 
 // ── INCOME ───────────────────────────────────────────────────────
@@ -551,17 +555,6 @@ async function addTx(){
   try{
     await api('/transactions','POST',tx)
     transactions.unshift(tx)
-    // Auto-update bill actuals for gas, groceries, free-spend
-    if(t==='gas'||t==='groceries'||t==='free-spend'){
-      const billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Free Cash'
-      const bill=bills.find(b=>b.name===billName)
-      if(bill){
-        const currentActual=billActuals[bill.id]||0
-        const newActual=currentActual+a
-        billActuals[bill.id]=newActual
-        await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
-      }
-    }
     document.getElementById('tx-merchant').value=''
     document.getElementById('tx-amount').value=''
     showToast('Transaction logged')
@@ -579,12 +572,24 @@ function renderTx(){
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
     transactions.map(t=>`<div style="display:grid;grid-template-columns:1fr 65px 80px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
       <span style="font-size:12px">${t.merchant}</span><span style="font-weight:500">${fmtD(t.amount)}</span>
-      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='free-spend'?'badge-f':t.type==='gas'?'badge-g':'badge-gr'}">${t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='free-spend'?'Free Spend':t.type==='gas'?'Gas':'Groceries'}</span></span>
+      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='free-spend'?'badge-f':'badge-o'}">${t.type==='budgeted'?'Budgeted':t.type==='free-spend'?'Free Spend':'Off-budget'}</span></span>
       <span style="color:#9A9C99;font-size:11px">${t.logged_by}</span>
       <button onclick="deleteTx('${t.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
     </div>`).join('')
 
-
+  const fs=freeSummary()
+  const fsEl=document.getElementById('tx-free-summary')
+  if(!fs.budget){fsEl.innerHTML='<div class="empty" style="font-size:12px">Set a Free Money budget on the Dashboard first.</div>'}
+  else{
+    const pct=Math.min(100,Math.round(fs.spent/fs.budget*100))
+    const freeTx=transactions.filter(t=>t.type==='free-spend')
+    fsEl.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+      <span class="rl">Budget: <span style="color:#E8E8E6;font-weight:500">${fmt(fs.budget)}</span></span>
+      <span class="rl">Spent: <span style="color:#EF9F27;font-weight:500">${fmt(fs.spent)}</span></span>
+      <span class="rl">Left: <span style="font-weight:500;color:${fs.over?'#E24B4A':'#1D9E75'}">${fmt(fs.remaining)}</span></span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${fs.over?'#E24B4A':'#EF9F27'}"></div></div>
+    ${freeTx.length?`<div style="margin-top:8px">${freeTx.map(t=>`<div class="row"><span class="rl">${t.merchant}</span><span class="gold" style="font-weight:500">${fmtD(t.amount)}</span></div>`).join('')}</div>`:''}`}
 
   const off=transactions.filter(t=>t.type==='off-budget')
   document.getElementById('leak-view').innerHTML=!off.length?'<div class="empty">No off-budget spending this month.</div>':
@@ -592,7 +597,7 @@ function renderTx(){
      <div class="row"><span class="rl">Total</span><span class="rv r">${fmtD(off.reduce((s,t)=>s+t.amount,0))}</span></div>
      ${off.map(t=>`<div class="row"><span class="rl" style="font-size:12px">${t.merchant}</span><span class="rv">${fmtD(t.amount)}</span></div>`).join('')}`
 
-
+  const tl=document.getElementById('tx-month-label2');if(tl)tl.textContent=monthStr()
 }
 
 // ── GOALS / DEBTS ────────────────────────────────────────────────
