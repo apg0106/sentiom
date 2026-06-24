@@ -401,7 +401,9 @@ function renderDash(){
   const freeAmt=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
   const fs=freeSummary()
 
-  document.getElementById('dash-metrics').innerHTML=`
+  document.getElementById('ledger-amount').textContent=fmt(ledger) document.getElementById('ledger-amount').style.color=ledger>=0?'
+#1D9E75':'
+#E24B4A' document.getElementById('ledger-detail').textContent=fmt(totalInc)+' income · '+fmt(billsPaid)+' bills paid · '+fmt(allTx)+' transactions' document.getElementById('dash-metrics').innerHTML=`
     <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
     <div class="metric"><div class="mlabel">Bills (actual)</div><div class="mval a">${fmt(actBills)}</div></div>
     <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
