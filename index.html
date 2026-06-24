@@ -318,7 +318,7 @@ async function doLogin(){
   if(pass !== FAMILY_PIN){err.textContent='Wrong passphrase — try again';return}
   err.textContent=''
   USER=name
-  sessionStorage.setItem('sentiom_user',name)
+  localStorage.setItem('sentiom_user',name)
   startApp()
 }
 
@@ -707,7 +707,7 @@ function renderGoals(){
 }
 
 // ── AUTO LOGIN if session saved ───────────────────────────────────
-const savedUser=sessionStorage.getItem('sentiom_user')
+const savedUser=localStorage.getItem('sentiom_user')
 if(savedUser){
   USER=savedUser
   document.getElementById('login-screen').style.display='none'
