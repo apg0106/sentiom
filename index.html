@@ -584,7 +584,7 @@ function renderTx(){
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
     transactions.map(t=>`<div style="display:grid;grid-template-columns:1fr 65px 80px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
       <span style="font-size:12px">${t.merchant}</span><span style="font-weight:500">${fmtD(t.amount)}</span>
-      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='free-spend'?'badge-f':'badge-o'}">${t.type==='budgeted'?'Budgeted':t.type==='free-spend'?'Free Spend':'Off-budget'}</span></span>
+      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='free-spend'?'badge-f':'badge-o'}" style="${t.type==='gas'||t.type==='groceries'?'background:#0A2A0A;color:#5DC85D;padding:2px 7px;border-radius:100px;font-size:11px':''}">${t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='free-spend'?'Free Spend':t.type==='gas'?'Gas':t.type==='groceries'?'Groceries':'Off-budget'}</span></span>
       <span style="color:#9A9C99;font-size:11px">${t.logged_by}</span>
       <button onclick="deleteTx('${t.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
     </div>`).join('')
