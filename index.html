@@ -357,7 +357,7 @@ async function loadAll(){
     billActData.forEach(b=>{billActuals[b.bill_id]=b.actual})
     goals=goalData
     renderAll()
-  }catch(e){showToast('Connection error — check your internet',true)}
+  }catch(e){console.error('loadAll error:',e);showToast('Error: '+e.message,true)}
 }
 
 // ── TAB ROUTING ──────────────────────────────────────────────────
