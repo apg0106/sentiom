@@ -400,7 +400,7 @@ function renderDash(){
     <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
     <div class="metric"><div class="mlabel">Bills (actual)</div><div class="mval a">${fmt(actBills)}</div></div>
     <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
-    <div class="metric"><div class="mlabel">Free spend used</div><div class="mval gold">${fmt(freeAmt)}</div></div>`
+    <div class="metric"><div class="mlabel">Remaining Free Spend</div><div class="mval gold">${fmt(freeAmt)}</div></div>`
 
   const di=document.getElementById('dash-income')
   if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
