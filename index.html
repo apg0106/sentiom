@@ -554,7 +554,8 @@ async function updateBillActual(id,val){
 
 function renderBills(){
   const mk=mKey()
-  document.getElementById('bills-list').innerHTML=bills.map(b=>`
+  const sortedBills=[...bills].sort((a,b)=>a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name))
+  document.getElementById('bills-list').innerHTML=sortedBills.map(b=>`
     <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
       <span class="rl" style="font-size:12px">${b.name}</span>
       <span style="font-size:10px;color:#6B6D69">${b.cat}</span>
