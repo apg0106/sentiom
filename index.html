@@ -55,6 +55,8 @@ input::placeholder{color:#6B6D69}
 .badge-b{background:#0A2018;color:#1D9E75;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-o{background:#2A0A0A;color:#E24B4A;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-f{background:#1A1400;color:#EF9F27;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.badge-g{background:#0A1A0A;color:#5DC85D;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.badge-gr{background:#1A0A1A;color:#C85DC8;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-i{background:#0A1A2A;color:#378ADD;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .log-entry{font-size:12px;color:#9A9C99;padding:5px 0;border-bottom:0.5px solid #1A1D1B;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .log-entry:last-child{border-bottom:none}
@@ -174,7 +176,7 @@ input::placeholder{color:#6B6D69}
           <div><label class="form-label">Source</label><input id="inc-source" placeholder="e.g. Paycheck, RSU vest"></div>
           <div><label class="form-label">Amount</label><input id="inc-amount" type="number" placeholder="0.00"></div>
           <div><label class="form-label">Type</label>
-            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Previous Balance</option><option>Other</option></select>
+            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Other</option></select>
           </div>
           <div><label class="form-label">Date</label><input id="inc-date" type="date"></div>
         </div>
@@ -230,6 +232,8 @@ input::placeholder{color:#6B6D69}
               <option value="budgeted">Budgeted</option>
               <option value="off-budget">Off-budget</option>
               <option value="free-spend">Free Spend</option>
+              <option value="gas">Gas</option>
+              <option value="groceries">Groceries</option>
             </select>
           </div>
         </div>
@@ -318,7 +322,7 @@ async function doLogin(){
   if(pass !== FAMILY_PIN){err.textContent='Wrong passphrase — try again';return}
   err.textContent=''
   USER=name
-  localStorage.setItem('sentiom_user',name)
+  sessionStorage.setItem('sentiom_user',name)
   startApp()
 }
 
@@ -390,17 +394,33 @@ function renderAll(){renderDash();renderIncome();renderBills();renderTx();render
 function renderDash(){
   const totalInc=incomeLog.reduce((s,i)=>s+i.amount,0)
   const estBills=bills.reduce((s,b)=>s+b.est,0)
+  // Only subtract bills where actual has been entered
+  const actBillsEntered=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:0),0)
   const actBills=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0)
   const offAmt=transactions.filter(t=>t.type==='off-budget').reduce((s,t)=>s+t.amount,0)
   const budAmt=transactions.filter(t=>t.type==='budgeted').reduce((s,t)=>s+t.amount,0)
   const freeAmt=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
+  const gasAmt=transactions.filter(t=>t.type==='gas').reduce((s,t)=>s+t.amount,0)
+  const grocAmt=transactions.filter(t=>t.type==='groceries').reduce((s,t)=>s+t.amount,0)
+  const allTxAmt=offAmt+budAmt+freeAmt+gasAmt+grocAmt
+  // Ledger = all income - bills actually entered - all transactions
+  const ledgerBalance=totalInc-actBillsEntered-allTxAmt
+  // Free Cash = find Free Cash bill est - free spend transactions
+  const freeCashBill=bills.find(b=>b.name==='Free Cash')
+  const freeCashBudget=freeCashBill?freeCashBill.est:1000
+  const remainingFreeCash=freeCashBudget-freeAmt
   const fs=freeSummary()
 
   document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric" style="grid-column:span 2;background:#0A1A12;border:0.5px solid #1D9E75">
+      <div class="mlabel" style="color:#1D9E75">Ledger balance</div>
+      <div class="mval" style="font-size:28px;color:${ledgerBalance>=0?'#1D9E75':'#E24B4A'}">${fmt(ledgerBalance)}</div>
+      <div style="font-size:11px;color:#6B6D69;margin-top:4px">${fmt(totalInc)} in · ${fmt(actBillsEntered)} bills · ${fmt(allTxAmt)} transactions</div>
+    </div>
     <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
-    <div class="metric"><div class="mlabel">Bills (actual)</div><div class="mval a">${fmt(actBills)}</div></div>
+    <div class="metric"><div class="mlabel">Bills paid</div><div class="mval a">${fmt(actBillsEntered)}</div></div>
     <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
-    <div class="metric"><div class="mlabel">Remaining Free Spend</div><div class="mval gold">${fmt(freeAmt)}</div></div>`
+    <div class="metric" style="background:#1A1400;border:0.5px solid #EF9F27"><div class="mlabel" style="color:#EF9F27">Remaining free cash</div><div class="mval gold">${fmt(remainingFreeCash)}</div><div style="font-size:11px;color:#6B6D69;margin-top:2px">${fmt(freeCashBudget)} budget · ${fmt(freeAmt)} spent</div></div>`
 
   const di=document.getElementById('dash-income')
   if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
@@ -454,8 +474,10 @@ async function updateFreeBudget(val){
 }
 
 function freeSummary(){
+  const freeCashBill=bills.find(b=>b.name==='Free Cash')
+  const budget=freeCashBill?freeCashBill.est:1000
   const spent=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
-  return{budget:freeBudget,spent,remaining:Math.max(0,freeBudget-spent),over:spent>freeBudget&&freeBudget>0}
+  return{budget,spent,remaining:Math.max(0,budget-spent),over:spent>budget&&budget>0}
 }
 
 // ── INCOME ───────────────────────────────────────────────────────
@@ -555,6 +577,17 @@ async function addTx(){
   try{
     await api('/transactions','POST',tx)
     transactions.unshift(tx)
+    // Auto-update bill actuals for gas, groceries, free-spend
+    if(t==='gas'||t==='groceries'||t==='free-spend'){
+      const billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Free Cash'
+      const bill=bills.find(b=>b.name===billName)
+      if(bill){
+        const currentActual=billActuals[bill.id]||0
+        const newActual=currentActual+a
+        billActuals[bill.id]=newActual
+        await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
+      }
+    }
     document.getElementById('tx-merchant').value=''
     document.getElementById('tx-amount').value=''
     showToast('Transaction logged')
@@ -572,7 +605,7 @@ function renderTx(){
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
     transactions.map(t=>`<div style="display:grid;grid-template-columns:1fr 65px 80px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
       <span style="font-size:12px">${t.merchant}</span><span style="font-weight:500">${fmtD(t.amount)}</span>
-      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='free-spend'?'badge-f':'badge-o'}">${t.type==='budgeted'?'Budgeted':t.type==='free-spend'?'Free Spend':'Off-budget'}</span></span>
+      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='free-spend'?'badge-f':t.type==='gas'?'badge-g':'badge-gr'}">${t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='free-spend'?'Free Spend':t.type==='gas'?'Gas':'Groceries'}</span></span>
       <span style="color:#9A9C99;font-size:11px">${t.logged_by}</span>
       <button onclick="deleteTx('${t.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
     </div>`).join('')
@@ -707,7 +740,7 @@ function renderGoals(){
 }
 
 // ── AUTO LOGIN if session saved ───────────────────────────────────
-const savedUser=localStorage.getItem('sentiom_user')
+const savedUser=sessionStorage.getItem('sentiom_user')
 if(savedUser){
   USER=savedUser
   document.getElementById('login-screen').style.display='none'
