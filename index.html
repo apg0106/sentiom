@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F1110">
+<title>Sentiom</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0F1110;color:#E8E8E6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;overscroll-behavior:none}
+.app{display:flex;flex-direction:column;height:100vh;max-width:700px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid #1E221F;flex-shrink:0;background:#0F1110;position:sticky;top:0;z-index:10}
+.logo{font-size:20px;font-weight:600;letter-spacing:-0.5px}.logo span{color:#1D9E75}
+.month-nav{display:flex;align-items:center;gap:8px}
+.month-nav button{background:none;border:none;color:#9A9C99;cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px}
+.month-nav button:active{background:#1E221F}
+#month-label{font-size:13px;font-weight:500;min-width:100px;text-align:center;color:#E8E8E6}
+.user-pills{display:flex;gap:6px}
+.upill{padding:4px 12px;font-size:12px;border-radius:100px;border:0.5px solid #2A2D2B;background:transparent;color:#9A9C99;cursor:pointer;transition:all 0.15s}
+.upill.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.nav{display:flex;border-bottom:0.5px solid #1E221F;padding:0 16px;overflow-x:auto;gap:0;flex-shrink:0;background:#0F1110;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav button{padding:10px 14px;font-size:12px;border:none;background:transparent;cursor:pointer;color:#6B6D69;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;transition:color 0.15s}
+.nav button.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500}
+.body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+@media(min-width:500px){.metrics{grid-template-columns:repeat(4,1fr)}}
+.metric{background:#161A17;border-radius:10px;padding:11px 13px}
+.mlabel{font-size:11px;color:#6B6D69;margin-bottom:4px}
+.mval{font-size:18px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:500px){.two{grid-template-columns:1fr 1fr}}
+.card{background:#101310;border:0.5px solid #1E221F;border-radius:12px;padding:14px 15px;margin-bottom:12px}
+.ctitle{font-size:11px;font-weight:500;color:#6B6D69;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid #1A1D1B;font-size:13px}
+.row:last-child{border-bottom:none}
+.rl{color:#9A9C99}.rv{font-weight:500}
+.prog-track{background:#1E221F;border-radius:4px;height:5px;overflow:hidden;margin-bottom:5px}
+.prog-fill{height:100%;border-radius:4px;transition:width 0.3s ease}
+.empty{text-align:center;padding:20px;color:#6B6D69;font-size:13px}
+input,select{font-size:13px;padding:8px 10px;border-radius:8px;border:0.5px solid #2A2D2B;background:#161A17;color:#E8E8E6;width:100%;outline:none;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:#1D9E75}
+input::placeholder{color:#6B6D69}
+.inp-sm{font-size:12px;padding:5px 8px;border-radius:6px;border:0.5px solid #2A2D2B;background:transparent;color:#E8E8E6;outline:none}
+.inp-sm:focus{border-color:#1D9E75}
+.btn{padding:8px 14px;border-radius:8px;border:0.5px solid #2A2D2B;background:transparent;color:#9A9C99;font-size:13px;cursor:pointer}
+.btn:active{background:#1A1D1B}
+.btn-g{border-color:#1D9E75;background:#1D9E75;color:#fff;font-weight:500}
+.btn-g:active{background:#0F6E56}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px;border:0.5px solid #2A2D2B;background:transparent;color:#9A9C99;cursor:pointer}
+.btn-plus{border-color:#0A2018;background:#0A2018;color:#1D9E75}
+.btn-minus{border-color:#2A0A0A;background:#2A0A0A;color:#E24B4A}
+.badge-b{background:#0A2018;color:#1D9E75;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.badge-o{background:#2A0A0A;color:#E24B4A;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.badge-f{background:#1A1400;color:#EF9F27;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.badge-i{background:#0A1A2A;color:#378ADD;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
+.log-entry{font-size:12px;color:#9A9C99;padding:5px 0;border-bottom:0.5px solid #1A1D1B;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-entry:last-child{border-bottom:none}
+.dp{color:#1D9E75;font-size:12px;font-weight:500;white-space:nowrap}
+.dn{color:#E24B4A;font-size:12px;font-weight:500;white-space:nowrap}
+.leak-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:6px 0}
+.free-card{border-color:#EF9F27 !important}
+.g{color:#1D9E75}.a{color:#BA7517}.r{color:#E24B4A}.b{color:#378ADD}.p{color:#7F77DD}.gold{color:#EF9F27}
+.form-grid{display:grid;gap:8px;margin-bottom:4px}
+.form-label{font-size:11px;color:#6B6D69;margin-bottom:4px;display:block}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #1E221F;border-top-color:#1D9E75;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Login screen */
+.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.login-logo{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.login-logo span{color:#1D9E75}
+.login-sub{font-size:14px;color:#6B6D69;margin-bottom:40px;text-align:center}
+.login-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px}
+.login-err{color:#E24B4A;font-size:13px;text-align:center;min-height:18px}
+</style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div class="login-screen" id="login-screen">
+  <div class="login-logo">sentiom<span>.</span></div>
+  <div class="login-sub">Your family's financial home base</div>
+  <div class="login-form">
+    <div>
+      <label class="form-label">Your name</label>
+      <input id="login-name" placeholder="e.g. John or Tabby" autocomplete="name">
+    </div>
+    <div>
+      <label class="form-label">Family passphrase</label>
+      <input id="login-pass" type="password" placeholder="Enter your passphrase" autocomplete="current-password">
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <button class="btn btn-g" onclick="doLogin()" style="width:100%;padding:12px">Sign in</button>
+  </div>
+</div>
+
+<!-- Main app -->
+<div class="app" id="main-app" style="display:none">
+
+  <div class="topbar">
+    <div class="logo">sentiom<span>.</span></div>
+    <div class="month-nav">
+      <button onclick="prevMonth()" aria-label="previous month">‹</button>
+      <span id="month-label"></span>
+      <button onclick="nextMonth()" aria-label="next month">›</button>
+    </div>
+    <div class="user-pills">
+      <button class="upill active" id="pill-you" onclick="setUser(this)"></button>
+      <button class="upill" id="pill-other" onclick="setUser(this)" style="display:none"></button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
+    <button onclick="showTab('income',this)">Income</button>
+    <button onclick="showTab('bills',this)">Bills</button>
+    <button onclick="showTab('transactions',this)">Transactions</button>
+    <button onclick="showTab('goals',this)">Goals / Debts</button>
+  </div>
+
+  <div class="body">
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard">
+      <div class="metrics" id="dash-metrics"></div>
+      <div class="two">
+        <div>
+          <div class="card">
+            <div class="ctitle">Income this month</div>
+            <div id="dash-income"><div class="empty">No income logged yet.</div></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Bills — est vs actual</div>
+            <div id="dash-bills"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ctitle">Goals / debts</div>
+            <div id="dash-goals"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Spending breakdown</div>
+            <div id="dash-spending"><div class="empty">No transactions yet.</div></div>
+          </div>
+          <div class="card free-card">
+            <div class="ctitle" style="color:#EF9F27">Free Money <span style="font-size:11px;color:#6B6D69;font-weight:400;text-transform:none">monthly fun budget</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <label class="form-label" style="margin:0;white-space:nowrap">Budget:</label>
+              <input type="number" id="free-budget-input" placeholder="e.g. 2000" style="width:100px" oninput="updateFreeBudget(this.value)">
+              <span style="font-size:12px;color:#6B6D69;white-space:nowrap">/ month</span>
+            </div>
+            <div id="dash-free-bar"></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px">
+              <span class="rl">Remaining</span>
+              <span id="dash-free-remaining" style="font-weight:600;font-size:17px;color:#EF9F27">—</span>
+            </div>
+            <div id="dash-free-detail" style="font-size:12px;color:#6B6D69;margin-top:3px;text-align:right"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INCOME -->
+    <div id="tab-income" style="display:none">
+      <div class="card">
+        <div class="ctitle">Log income</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div><label class="form-label">Source</label><input id="inc-source" placeholder="e.g. Paycheck, RSU vest"></div>
+          <div><label class="form-label">Amount</label><input id="inc-amount" type="number" placeholder="0.00"></div>
+          <div><label class="form-label">Type</label>
+            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Other</option></select>
+          </div>
+          <div><label class="form-label">Date</label><input id="inc-date" type="date"></div>
+        </div>
+        <button class="btn btn-g" onclick="addIncome()" style="width:100%;margin-top:4px">Add income</button>
+      </div>
+      <div class="card">
+        <div class="ctitle">Income log</div>
+        <div id="inc-list"><div class="empty">No income logged this month.</div></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:500;border-top:0.5px solid #1E221F;margin-top:4px">
+          <span class="rl">Total</span><span class="g" id="inc-total-val">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLS -->
+    <div id="tab-bills" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:12px;color:#6B6D69">Edit est. anytime. Enter actuals each month.</span>
+        <button class="btn" onclick="toggleForm('add-bill-form')">+ Add bill</button>
+      </div>
+      <div id="add-bill-form" style="display:none" class="card">
+        <div class="ctitle">New bill</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div><label class="form-label">Name</label><input id="nb-name" placeholder="e.g. Pool payment"></div>
+          <div><label class="form-label">Est. amount</label><input id="nb-est" type="number" placeholder="0"></div>
+          <div><label class="form-label">Category</label>
+            <select id="nb-cat"><option>Housing</option><option>Utilities</option><option>Transport</option><option>Food</option><option>Subscriptions</option><option>Other</option></select>
+          </div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-g" onclick="addBill()" style="width:100%">Add</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:11px;color:#6B6D69;font-weight:500;padding:4px 0;border-bottom:0.5px solid #1E221F;margin-bottom:4px">
+          <span>Bill</span><span>Cat.</span><span>Est.</span><span>Actual</span><span></span>
+        </div>
+        <div id="bills-list"></div>
+        <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:13px;font-weight:500;padding:8px 0 0;border-top:0.5px solid #1E221F;margin-top:4px">
+          <span class="rl">Total</span><span></span><span class="a" id="bills-est-total"></span><span class="r" id="bills-act-total"></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div id="tab-transactions" style="display:none">
+      <div class="card">
+        <div class="ctitle">Log a transaction</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div><label class="form-label">Merchant</label><input id="tx-merchant" placeholder="e.g. Pizza Hut, Amazon"></div>
+          <div><label class="form-label">Amount</label><input id="tx-amount" type="number" step="0.01" placeholder="0.00"></div>
+          <div><label class="form-label">Date</label><input id="tx-date" type="date"></div>
+          <div><label class="form-label">Type</label>
+            <select id="tx-type">
+              <option value="budgeted">Budgeted</option>
+              <option value="off-budget">Off-budget</option>
+              <option value="free-spend">Free Spend</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-g" onclick="addTx()" style="width:100%;margin-top:4px">Add transaction</button>
+      </div>
+
+      <div class="card free-card">
+        <div class="ctitle" style="color:#EF9F27">Free Money — <span id="tx-month-label2" style="font-weight:400;text-transform:none;color:#6B6D69"></span></div>
+        <div id="tx-free-summary"><div class="empty" style="font-size:12px">Set a Free Money budget on the Dashboard first.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle">All transactions</div>
+        <div id="tx-list"><div class="empty">No transactions this month.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle">Off-budget leak</div>
+        <div id="leak-view"><div class="empty">No off-budget spending this month.</div></div>
+      </div>
+    </div>
+
+    <!-- GOALS / DEBTS -->
+    <div id="tab-goals" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:12px;color:#6B6D69">Edit balance and target directly. Log extra payments with +/−.</span>
+        <button class="btn" onclick="toggleForm('add-goal-form')">+ Add</button>
+      </div>
+      <div id="add-goal-form" style="display:none" class="card">
+        <div class="ctitle">New goal or debt</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div><label class="form-label">Name</label><input id="ng-name" placeholder="e.g. Pool fund, Car loan"></div>
+          <div><label class="form-label">Type</label>
+            <select id="ng-type"><option value="savings">Savings goal</option><option value="debt">Debt payoff</option></select>
+          </div>
+          <div><label class="form-label">Current balance / saved</label><input id="ng-current" type="number" placeholder="0"></div>
+          <div><label class="form-label">Target amount</label><input id="ng-target" type="number" placeholder="0"></div>
+        </div>
+        <button class="btn btn-g" onclick="addGoal()" style="width:100%;margin-top:4px">Add</button>
+      </div>
+      <div id="goals-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS=['#1D9E75','#BA7517','#378ADD','#7F77DD','#E24B4A','#0F6E56','#854F0B']
+let AUTH='',USER='',OTHER_USER=''
+let viewYear=new Date().getFullYear(),viewMonth=new Date().getMonth()
+let bills=[],billActuals={},goals=[],transactions=[],incomeLog=[],freeBudget=0
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function fmt(n){return'$'+Math.round(n).toLocaleString()}
+function fmtD(n){return'$'+parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function mKey(){return`${viewYear}-${viewMonth}`}
+function monthStr(){return new Date(viewYear,viewMonth,1).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+function today(){return new Date().toISOString().split('T')[0]}
+
+async function api(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}}
+  if(body)opts.body=JSON.stringify(body)
+  const res=await fetch('/api'+path,opts)
+  if(!res.ok)throw new Error('API error '+res.status)
+  return res.json()
+}
+
+function showToast(msg,isErr=false){
+  const t=document.getElementById('toast')
+  t.textContent=msg
+  t.style.background=isErr?'#A32D2D':'#1D9E75'
+  t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2200)
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────
+const FAMILY_PIN = 'Douglas0907'
+async function doLogin(){
+  const name=document.getElementById('login-name').value.trim()
+  const pass=document.getElementById('login-pass').value.trim()
+  const err=document.getElementById('login-err')
+  if(!name){err.textContent='Please enter your name';return}
+  if(!pass){err.textContent='Please enter the passphrase';return}
+  if(pass !== FAMILY_PIN){err.textContent='Wrong passphrase — try again';return}
+  err.textContent=''
+  USER=name
+  sessionStorage.setItem('sentiom_user',name)
+  startApp()
+}
+
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
+
+function startApp(){
+  document.getElementById('login-screen').style.display='none'
+  document.getElementById('main-app').style.display='flex'
+  document.getElementById('pill-you').textContent=USER
+  document.getElementById('tx-date').value=today()
+  document.getElementById('inc-date').value=today()
+  updateMonthLabel()
+  loadAll()
+}
+
+function setUser(btn){
+  document.querySelectorAll('.upill').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+  USER=btn.textContent
+}
+
+// ── MONTH NAV ────────────────────────────────────────────────────
+function updateMonthLabel(){
+  document.getElementById('month-label').textContent=monthStr()
+  const t=document.getElementById('tx-month-label2');if(t)t.textContent=monthStr()
+  const fb=document.getElementById('free-budget-input')
+  if(fb)fb.value=freeBudget||''
+}
+function prevMonth(){viewMonth===0?(viewMonth=11,viewYear--):(viewMonth--);loadAll()}
+function nextMonth(){viewMonth===11?(viewMonth=0,viewYear++):(viewMonth++);loadAll()}
+
+// ── LOAD DATA ────────────────────────────────────────────────────
+async function loadAll(){
+  updateMonthLabel()
+  try{
+    const mk=mKey()
+    const[txData,incData,billData,billActData,goalData,freeData]=await Promise.all([
+      api('/transactions?month_key='+mk),
+      api('/income?month_key='+mk),
+      api('/bills'),
+      api('/bill-actuals?month_key='+mk),
+      api('/goals'),
+      api('/free-budget?month_key='+mk),
+    ])
+    transactions=txData
+    incomeLog=incData
+    bills=billData
+    billActuals={}
+    billActData.forEach(b=>{billActuals[b.bill_id]=b.actual})
+    goals=goalData
+    freeBudget=freeData.amount||0
+    const fb=document.getElementById('free-budget-input')
+    if(fb)fb.value=freeBudget||''
+    renderAll()
+  }catch(e){showToast('Connection error — check your internet',true)}
+}
+
+// ── TAB ROUTING ──────────────────────────────────────────────────
+function showTab(id,btn){
+  ['dashboard','income','bills','transactions','goals'].forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'':'none')
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+  renderAll()
+}
+function toggleForm(id){const f=document.getElementById(id);f.style.display=f.style.display==='none'?'':'none'}
+function renderAll(){renderDash();renderIncome();renderBills();renderTx();renderGoals()}
+
+// ── DASHBOARD ────────────────────────────────────────────────────
+function renderDash(){
+  const totalInc=incomeLog.reduce((s,i)=>s+i.amount,0)
+  const estBills=bills.reduce((s,b)=>s+b.est,0)
+  const actBills=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0)
+  const offAmt=transactions.filter(t=>t.type==='off-budget').reduce((s,t)=>s+t.amount,0)
+  const budAmt=transactions.filter(t=>t.type==='budgeted').reduce((s,t)=>s+t.amount,0)
+  const freeAmt=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
+  const fs=freeSummary()
+
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
+    <div class="metric"><div class="mlabel">Bills (actual)</div><div class="mval a">${fmt(actBills)}</div></div>
+    <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
+    <div class="metric"><div class="mlabel">Free spend used</div><div class="mval gold">${fmt(freeAmt)}</div></div>`
+
+  const di=document.getElementById('dash-income')
+  if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
+  else{
+    const bt={};incomeLog.forEach(i=>{bt[i.type]=(bt[i.type]||0)+i.amount})
+    di.innerHTML=Object.entries(bt).map(([t,v])=>`<div class="row"><span class="rl">${t}</span><span class="rv g">${fmt(v)}</span></div>`).join('')+
+    `<div class="row"><span class="rl" style="font-weight:500;color:#E8E8E6">Total</span><span class="rv g">${fmt(totalInc)}</span></div>`}
+
+  const cats={};bills.forEach(b=>{const a=billActuals[b.id]!==undefined?billActuals[b.id]:b.est;cats[b.cat]=cats[b.cat]||{est:0,act:0};cats[b.cat].est+=b.est;cats[b.cat].act+=a})
+  document.getElementById('dash-bills').innerHTML=Object.entries(cats).map(([c,v])=>`
+    <div class="row"><span class="rl">${c}</span><span style="font-size:11px;color:#6B6D69">${fmt(v.est)}</span><span class="rv ${v.act>v.est?'r':''}">${fmt(v.act)}</span></div>`).join('')+
+    `<div class="row"><span class="rl" style="font-weight:500;color:#E8E8E6">Total</span><span style="font-size:11px;color:#6B6D69">${fmt(estBills)}</span><span class="rv r">${fmt(actBills)}</span></div>`
+
+  document.getElementById('dash-goals').innerHTML=goals.map(g=>{
+    const pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100))
+    return`<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#9A9C99;margin-bottom:3px">
+        <span>${g.name}</span><span>${g.type==='debt'?fmt(Math.max(0,g.current))+' left':fmt(g.current)+' / '+fmt(g.target)}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${g.color}"></div></div>
+    </div>`}).join('')
+
+  const tot=offAmt+budAmt+freeAmt
+  const ds=document.getElementById('dash-spending')
+  if(!tot){ds.innerHTML='<div class="empty">No transactions yet.</div>'}
+  else{
+    const bp=Math.round(budAmt/tot*100),op=Math.round(offAmt/tot*100),fp=100-bp-op
+    ds.innerHTML=`<div style="font-size:12px;color:#9A9C99;margin-bottom:5px">${fmtD(tot)} logged</div>
+    <div class="leak-bar"><div style="width:${bp}%;background:#1D9E75"></div><div style="width:${op}%;background:#E24B4A"></div><div style="width:${fp}%;background:#EF9F27"></div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#9A9C99">
+      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#1D9E75;margin-right:3px"></span>Budgeted ${fmt(budAmt)}</span>
+      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#E24B4A;margin-right:3px"></span>Off-budget ${fmt(offAmt)}</span>
+      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#EF9F27;margin-right:3px"></span>Free spend ${fmt(freeAmt)}</span>
+    </div>`}
+
+  const rem=document.getElementById('dash-free-remaining'),bar=document.getElementById('dash-free-bar'),det=document.getElementById('dash-free-detail')
+  if(!fs.budget){rem.textContent='Set a budget →';rem.style.color='#6B6D69';bar.innerHTML='';det.textContent='Enter your monthly fun money amount above'}
+  else{
+    const pct=Math.min(100,Math.round(fs.spent/fs.budget*100))
+    rem.textContent=fmt(fs.remaining);rem.style.color=fs.over?'#E24B4A':'#EF9F27'
+    bar.innerHTML=`<div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${fs.over?'#E24B4A':'#EF9F27'}"></div></div>`
+    det.textContent=`${fmt(fs.spent)} spent of ${fmt(fs.budget)}${fs.over?' — over budget':''}`}
+}
+
+async function updateFreeBudget(val){
+  const v=parseFloat(val)
+  if(isNaN(v)||v<0)return
+  freeBudget=v
+  try{await api('/free-budget','POST',{month_key:mKey(),amount:v});renderDash();renderTx()}
+  catch(e){showToast('Could not save budget',true)}
+}
+
+function freeSummary(){
+  const spent=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
+  return{budget:freeBudget,spent,remaining:Math.max(0,freeBudget-spent),over:spent>freeBudget&&freeBudget>0}
+}
+
+// ── INCOME ───────────────────────────────────────────────────────
+async function addIncome(){
+  const src=document.getElementById('inc-source').value.trim()
+  const amt=parseFloat(document.getElementById('inc-amount').value)
+  const type=document.getElementById('inc-type').value
+  const date=document.getElementById('inc-date').value
+  if(!src||isNaN(amt)||amt<=0||!date){showToast('Fill in all fields',true);return}
+  const entry={id:uid(),source:src,amount:amt,type,date,logged_by:USER,month_key:mKey()}
+  try{
+    await api('/income','POST',entry)
+    incomeLog.unshift(entry)
+    document.getElementById('inc-source').value=''
+    document.getElementById('inc-amount').value=''
+    showToast('Income logged')
+    renderAll()
+  }catch(e){showToast('Could not save',true)}
+}
+
+async function deleteIncome(id){
+  try{await api('/income/'+id,'DELETE');incomeLog=incomeLog.filter(i=>i.id!==id);renderAll()}
+  catch(e){showToast('Could not delete',true)}
+}
+
+function renderIncome(){
+  const el=document.getElementById('inc-list')
+  el.innerHTML=!incomeLog.length?'<div class="empty">No income logged this month.</div>':
+    incomeLog.map(i=>`<div style="display:grid;grid-template-columns:1fr 70px 90px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
+      <span>${i.source}</span><span class="g" style="font-weight:500">${fmtD(i.amount)}</span>
+      <span><span class="badge-i">${i.type}</span></span>
+      <button onclick="deleteIncome('${i.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
+    </div>`).join('')
+  document.getElementById('inc-total-val').textContent=fmtD(incomeLog.reduce((s,i)=>s+i.amount,0))
+}
+
+// ── BILLS ────────────────────────────────────────────────────────
+async function addBill(){
+  const name=document.getElementById('nb-name').value.trim()
+  const est=parseFloat(document.getElementById('nb-est').value)
+  const cat=document.getElementById('nb-cat').value
+  if(!name||isNaN(est)){showToast('Fill in all fields',true);return}
+  const bill={id:uid(),name,est,cat}
+  try{
+    await api('/bills','POST',bill)
+    bills.push(bill)
+    document.getElementById('nb-name').value=''
+    document.getElementById('nb-est').value=''
+    document.getElementById('add-bill-form').style.display='none'
+    showToast('Bill added')
+    renderAll()
+  }catch(e){showToast('Could not save',true)}
+}
+
+async function deleteBill(id){
+  try{await api('/bills/'+id,'DELETE');bills=bills.filter(b=>b.id!==id);renderAll();showToast('Bill removed')}
+  catch(e){showToast('Could not delete',true)}
+}
+
+async function updateBillEst(id,val){
+  const v=parseFloat(val);const b=bills.find(b=>b.id===id);if(!b||isNaN(v))return
+  b.est=v
+  try{await api('/bills/'+id,'PUT',{name:b.name,est:v,cat:b.cat});renderDash()}
+  catch(e){showToast('Could not save',true)}
+}
+
+async function updateBillActual(id,val){
+  const v=parseFloat(val)
+  if(isNaN(v)||v<0){delete billActuals[id];renderDash();return}
+  billActuals[id]=v
+  try{await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:v});renderDash()}
+  catch(e){showToast('Could not save',true)}
+}
+
+function renderBills(){
+  const mk=mKey()
+  document.getElementById('bills-list').innerHTML=bills.map(b=>`
+    <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
+      <span class="rl" style="font-size:12px">${b.name}</span>
+      <span style="font-size:10px;color:#6B6D69">${b.cat}</span>
+      <input class="inp-sm" type="number" value="${b.est}" onchange="updateBillEst('${b.id}',this.value)" style="width:100%;text-align:right">
+      <input class="inp-sm" type="number" placeholder="${b.est}" value="${billActuals[b.id]!==undefined?billActuals[b.id]:''}" oninput="updateBillActual('${b.id}',this.value)" style="width:100%;text-align:right">
+      <button onclick="deleteBill('${b.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0" aria-label="delete">✕</button>
+    </div>`).join('')
+  document.getElementById('bills-est-total').textContent=fmt(bills.reduce((s,b)=>s+b.est,0))
+  document.getElementById('bills-act-total').textContent=fmt(bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0))
+}
+
+// ── TRANSACTIONS ─────────────────────────────────────────────────
+async function addTx(){
+  const m=document.getElementById('tx-merchant').value.trim()
+  const a=parseFloat(document.getElementById('tx-amount').value)
+  const d=document.getElementById('tx-date').value
+  const t=document.getElementById('tx-type').value
+  if(!m||isNaN(a)||a<=0||!d){showToast('Fill in all fields',true);return}
+  const tx={id:uid(),merchant:m,amount:a,date:d,type:t,logged_by:USER,month_key:mKey()}
+  try{
+    await api('/transactions','POST',tx)
+    transactions.unshift(tx)
+    document.getElementById('tx-merchant').value=''
+    document.getElementById('tx-amount').value=''
+    showToast('Transaction logged')
+    renderAll()
+  }catch(e){showToast('Could not save',true)}
+}
+
+async function deleteTx(id){
+  try{await api('/transactions/'+id,'DELETE');transactions=transactions.filter(t=>t.id!==id);renderAll()}
+  catch(e){showToast('Could not delete',true)}
+}
+
+function renderTx(){
+  const el=document.getElementById('tx-list')
+  el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
+    transactions.map(t=>`<div style="display:grid;grid-template-columns:1fr 65px 80px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
+      <span style="font-size:12px">${t.merchant}</span><span style="font-weight:500">${fmtD(t.amount)}</span>
+      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='free-spend'?'badge-f':'badge-o'}">${t.type==='budgeted'?'Budgeted':t.type==='free-spend'?'Free Spend':'Off-budget'}</span></span>
+      <span style="color:#9A9C99;font-size:11px">${t.logged_by}</span>
+      <button onclick="deleteTx('${t.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
+    </div>`).join('')
+
+  const fs=freeSummary()
+  const fsEl=document.getElementById('tx-free-summary')
+  if(!fs.budget){fsEl.innerHTML='<div class="empty" style="font-size:12px">Set a Free Money budget on the Dashboard first.</div>'}
+  else{
+    const pct=Math.min(100,Math.round(fs.spent/fs.budget*100))
+    const freeTx=transactions.filter(t=>t.type==='free-spend')
+    fsEl.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+      <span class="rl">Budget: <span style="color:#E8E8E6;font-weight:500">${fmt(fs.budget)}</span></span>
+      <span class="rl">Spent: <span style="color:#EF9F27;font-weight:500">${fmt(fs.spent)}</span></span>
+      <span class="rl">Left: <span style="font-weight:500;color:${fs.over?'#E24B4A':'#1D9E75'}">${fmt(fs.remaining)}</span></span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${fs.over?'#E24B4A':'#EF9F27'}"></div></div>
+    ${freeTx.length?`<div style="margin-top:8px">${freeTx.map(t=>`<div class="row"><span class="rl">${t.merchant}</span><span class="gold" style="font-weight:500">${fmtD(t.amount)}</span></div>`).join('')}</div>`:''}`}
+
+  const off=transactions.filter(t=>t.type==='off-budget')
+  document.getElementById('leak-view').innerHTML=!off.length?'<div class="empty">No off-budget spending this month.</div>':
+    `<div class="row"><span class="rl">Count</span><span class="rv">${off.length}</span></div>
+     <div class="row"><span class="rl">Total</span><span class="rv r">${fmtD(off.reduce((s,t)=>s+t.amount,0))}</span></div>
+     ${off.map(t=>`<div class="row"><span class="rl" style="font-size:12px">${t.merchant}</span><span class="rv">${fmtD(t.amount)}</span></div>`).join('')}`
+
+  const tl=document.getElementById('tx-month-label2');if(tl)tl.textContent=monthStr()
+}
+
+// ── GOALS / DEBTS ────────────────────────────────────────────────
+async function addGoal(){
+  const name=document.getElementById('ng-name').value.trim()
+  const cur=parseFloat(document.getElementById('ng-current').value)||0
+  const tgt=parseFloat(document.getElementById('ng-target').value)||0
+  const type=document.getElementById('ng-type').value
+  if(!name||tgt<=0){showToast('Fill in name and target',true);return}
+  const goal={id:uid(),name,current:cur,target:tgt,type,color:COLORS[goals.length%COLORS.length],log:[]}
+  try{
+    await api('/goals','POST',goal)
+    goals.push(goal)
+    document.getElementById('ng-name').value=''
+    document.getElementById('ng-current').value=''
+    document.getElementById('ng-target').value=''
+    document.getElementById('add-goal-form').style.display='none'
+    showToast('Goal added')
+    renderAll()
+  }catch(e){showToast('Could not save',true)}
+}
+
+async function deleteGoal(id){
+  try{await api('/goals/'+id,'DELETE');goals=goals.filter(g=>g.id!==id);showToast('Goal removed');renderAll()}
+  catch(e){showToast('Could not delete',true)}
+}
+
+async function updateGoalField(id,field,val){
+  const g=goals.find(g=>g.id===id);if(!g)return
+  const v=parseFloat(val);if(isNaN(v)||v<0)return
+  g[field]=v
+  try{await api('/goals/'+id,'PUT',{name:g.name,current:g.current,target:g.target});renderDash()}
+  catch(e){showToast('Could not save',true)}
+}
+
+async function adjustGoal(id,sign){
+  const amtEl=document.getElementById('gadj-'+id),noteEl=document.getElementById('gnote-'+id)
+  const amt=parseFloat(amtEl.value)
+  if(isNaN(amt)||amt<=0){showToast('Enter an amount',true);return}
+  const note=noteEl.value.trim()||(sign>0?'Contribution':'Payment / withdrawal')
+  const entry={id:uid(),goal_id:id,delta:sign*amt,note,logged_by:USER,date:today()}
+  try{
+    await api('/goal-log','POST',entry)
+    const g=goals.find(g=>g.id===id);if(g){g.current=Math.max(0,g.current+(sign*amt));g.log=g.log||[];g.log.unshift({...entry,amount:sign*amt})}
+    amtEl.value='';noteEl.value=''
+    showToast(sign>0?'Added to goal':'Removed from goal')
+    renderAll()
+  }catch(e){showToast('Could not save',true)}
+}
+
+function renderGoals(){
+  const el=document.getElementById('goals-list')
+  if(!goals.length){el.innerHTML='<div class="empty">No goals or debts yet. Add one above.</div>';return}
+  el.innerHTML=goals.map(g=>{
+    const pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100))
+    const remaining=g.type==='debt'?Math.max(0,g.current):Math.max(0,g.target-g.current)
+    const recentLog=(g.log||[]).slice(0,3)
+    return`<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:600">${g.name}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:#6B6D69">${g.type==='debt'?'Debt':'Savings'}</span>
+          <button onclick="deleteGoal('${g.id}')" class="btn-sm" style="color:#6B6D69;font-size:11px">Remove</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">${g.type==='debt'?'Current balance':'Current saved'}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="color:#6B6D69;font-size:13px">$</span>
+            <input class="inp-sm" type="number" value="${g.current}" onchange="updateGoalField('${g.id}','current',this.value)" style="width:100%;font-size:18px;font-weight:600;color:${g.color};background:transparent">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">${g.type==='debt'?'Original balance':'Target'}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="color:#6B6D69;font-size:13px">$</span>
+            <input class="inp-sm" type="number" value="${g.target}" onchange="updateGoalField('${g.id}','target',this.value)" style="width:100%;font-size:18px;font-weight:600;color:#9A9C99;background:transparent">
+          </div>
+        </div>
+      </div>
+
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${g.color}"></div></div>
+      <div style="display:flex;gap:16px;font-size:12px;color:#9A9C99;margin-bottom:12px">
+        <span>${pct}% ${g.type==='debt'?'paid off':'funded'}</span>
+        <span>${fmt(remaining)} ${g.type==='debt'?'remaining':'to go'}</span>
+        ${remaining===0?'<span style="color:#1D9E75">Goal reached!</span>':''}
+      </div>
+
+      <div style="display:grid;grid-template-columns:90px 1fr 70px 70px;gap:8px;align-items:center;margin-bottom:${recentLog.length?'10px':'0'}">
+        <input class="inp-sm" id="gadj-${g.id}" type="number" placeholder="Amount" style="font-size:13px;padding:6px 8px">
+        <input class="inp-sm" id="gnote-${g.id}" placeholder="${g.type==='debt'?'Extra principal payment':'RSU deposit, bonus...'}" style="font-size:12px;padding:6px 8px">
+        <button onclick="adjustGoal('${g.id}',1)" class="btn-sm btn-plus">+ Add</button>
+        <button onclick="adjustGoal('${g.id}',-1)" class="btn-sm btn-minus">− Remove</button>
+      </div>
+
+      ${recentLog.length?`<div style="border-top:0.5px solid #1E221F;padding-top:8px">
+        <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">Recent activity</div>
+        ${recentLog.map(l=>`<div class="log-entry">
+          <span style="font-size:12px">${l.note} <span style="color:#6B6D69">· ${l.logged_by} · ${l.date}</span></span>
+          <span class="${l.amount>0?'dp':'dn'}">${l.amount>0?'+':''}${fmt(l.amount)}</span>
+        </div>`).join('')}
+      </div>`:''}
+    </div>`
+  }).join('')
+}
+
+// ── AUTO LOGIN if session saved ───────────────────────────────────
+const savedUser=sessionStorage.getItem('sentiom_user')
+if(savedUser){
+  USER=savedUser
+  document.getElementById('login-screen').style.display='none'
+  document.getElementById('main-app').style.display='flex'
+  document.getElementById('pill-you').textContent=USER
+  document.getElementById('tx-date').value=today()
+  document.getElementById('inc-date').value=today()
+  updateMonthLabel()
+  loadAll()
+}
+</script>
+</body>
+</html>
