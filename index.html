@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0F1110">
+<meta name="theme-color" content="#1D9E75">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
 <title>Sentiom</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -83,40 +85,22 @@ input::placeholder{color:#6B6D69}
 
 <div id="auth-screen" class="auth-screen">
   <div class="auth-logo">sentiom<span>.</span></div>
-  <div class="auth-sub" id="auth-sub">Your family's financial home base</div>
+  <div class="auth-sub" id="auth-sub">No bank syncing. No auto-categorization. Just you and your money.</div>
   <div class="auth-form" id="login-form">
-    <div><label class="form-label">Email</label><input id="login-email" type="text" placeholder="you@email.com" autocomplete="off"></div>
+    <div><label class="form-label">Email</label><input id="login-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
     <div><label class="form-label">Password</label><input id="login-password" type="password" placeholder="Your password" autocomplete="current-password"></div>
     <div class="auth-err" id="login-err"></div>
     <button class="btn btn-g" onclick="doLogin()" style="width:100%;padding:12px">Sign in</button>
-    <div style="text-align:center;margin-top:8px"><a onclick="showForgotPassword()" style="color:#6B6D69;font-size:13px;cursor:pointer">Forgot password?</a></div><div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
+    <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
   </div>
-  <div class="auth-form" id="signup-form" style="display:none" novalidate>
+  <div class="auth-form" id="signup-form" style="display:none">
     <div><label class="form-label">Family name</label><input id="signup-family" placeholder="e.g. The Gilberts" autocomplete="off"></div>
-    <div><label class="form-label">Email</label><input id="signup-email" type="text" placeholder="you@email.com" autocomplete="off"></div>
+    <div><label class="form-label">Email</label><input id="signup-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
     <div><label class="form-label">Password</label><input id="signup-password" type="password" placeholder="Choose a password" autocomplete="new-password"></div>
     <div class="auth-err" id="signup-err"></div>
     <button class="btn btn-g" onclick="doSignup()" style="width:100%;padding:12px">Create account</button>
     <div class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
   </div>
-
-  <!-- Forgot password form -->
-  <div class="auth-form" id="forgot-form" style="display:none">
-    <div><label class="form-label">Email</label><input id="forgot-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
-    <div class="auth-err" id="forgot-err"></div>
-    <div class="auth-err" id="forgot-ok" style="color:#1D9E75"></div>
-    <button class="btn btn-g" onclick="doForgotPassword()" style="width:100%;padding:12px">Send reset link</button>
-    <div class="auth-switch">Remember it? <a onclick="showLogin()">Sign in</a></div>
-  </div>
-
-  <!-- Reset password form -->
-  <div class="auth-form" id="reset-form" style="display:none">
-    <div><label class="form-label">New password</label><input id="reset-password" type="password" placeholder="Choose a new password" autocomplete="new-password"></div>
-    <div class="auth-err" id="reset-err"></div>
-    <div class="auth-err" id="reset-ok" style="color:#1D9E75"></div>
-    <button class="btn btn-g" onclick="doResetPassword()" style="width:100%;padding:12px">Set new password</button>
-  </div>
-
 </div>
 
 <div class="app" id="main-app" style="display:none">
@@ -251,6 +235,12 @@ input::placeholder{color:#6B6D69}
 
     <div id="tab-guide" style="display:none">
       <div class="card">
+        <div class="instr-section" style="margin-bottom:24px">
+          <div style="font-size:14px;color:#9A9C99;line-height:1.8;font-style:italic;border-left:3px solid #1D9E75;padding-left:16px">
+            De-automate your dollars. Somewhere between auto-pay bills and tap-to-pay lattes, we stopped looking at where our money actually goes. We let our financial habits slip into the background.<br><br>
+            Welcome to Sentiom — the digital equivalent of a 90s pen-and-paper ledger. No bank syncing, no automatic categorization, and zero background noise. By forcing you to manually track every single dollar, we're bringing intentionality back to your wallet. It's time to take your money off autopilot.
+          </div>
+        </div>
         <div class="instr-section">
           <div class="instr-title">Dashboard</div>
           <div class="instr-body">Your financial overview for the current month. Shows a <b>ledger balance</b> (income minus bills paid minus transactions), income summary, bills estimated vs actual, goals progress, and spending breakdown. Navigate months using the arrows at the top.</div>
@@ -351,40 +341,6 @@ function showLogin(){
   document.getElementById('signup-form').style.display='none';
   document.getElementById('login-form').style.display='flex';
   document.getElementById('auth-sub').textContent="Your family's financial home base"
-}
-
-function showForgotPassword(){
-  document.getElementById('login-form').style.display='none';
-  document.getElementById('forgot-form').style.display='flex';
-  document.getElementById('auth-sub').textContent='Reset your password'
-}
-
-async function doForgotPassword(){
-  var email=document.getElementById('forgot-email').value.trim();
-  var err=document.getElementById('forgot-err');
-  var ok=document.getElementById('forgot-ok');
-  err.textContent='';ok.textContent='';
-  if(!email){err.textContent='Please enter your email';return}
-  try{
-    await apiNoAuth('/forgot-password','POST',{email:email});
-    ok.textContent='If that email exists, a reset link is on its way.';
-  }catch(e){err.textContent=e.message||'Something went wrong'}
-}
-
-async function doResetPassword(){
-  var password=document.getElementById('reset-password').value;
-  var err=document.getElementById('reset-err');
-  var ok=document.getElementById('reset-ok');
-  err.textContent='';ok.textContent='';
-  if(!password||password.length<6){err.textContent='Password must be at least 6 characters';return}
-  var params=new URLSearchParams(window.location.search);
-  var token=params.get('token');
-  if(!token){err.textContent='Invalid reset link';return}
-  try{
-    await apiNoAuth('/reset-password','POST',{token:token,password:password});
-    ok.textContent='Password updated! Redirecting to login...';
-    setTimeout(function(){window.location.href='/'},2000)
-  }catch(e){err.textContent=e.message||'Something went wrong'}
 }
 
 async function doLogin(){
@@ -763,18 +719,13 @@ function renderGoals(){
     '</div>'}).join('')
 }
 
-var resetParams=new URLSearchParams(window.location.search);
-if(resetParams.get('token')){
-  document.getElementById('auth-sub').textContent='Choose a new password';
-  document.getElementById('reset-form').style.display='flex';
-} else {
 var savedToken=getCookie('sentiom_token');
 var savedName=getCookie('sentiom_name');
 var savedUid=getCookie('sentiom_uid');
 if(savedToken&&savedName){
   SESSION_TOKEN=savedToken;USER_NAME=savedName;USER_ID=savedUid;
   startApp()
-}}
+}
 </script>
 </body>
 </html>
