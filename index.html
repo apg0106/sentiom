@@ -85,15 +85,15 @@ input::placeholder{color:#6B6D69}
   <div class="auth-logo">sentiom<span>.</span></div>
   <div class="auth-sub" id="auth-sub">Your family's financial home base</div>
   <div class="auth-form" id="login-form">
-    <div><label class="form-label">Email</label><input id="login-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
+    <div><label class="form-label">Email</label><input id="login-email" type="text" placeholder="you@email.com" autocomplete="off"></div>
     <div><label class="form-label">Password</label><input id="login-password" type="password" placeholder="Your password" autocomplete="current-password"></div>
     <div class="auth-err" id="login-err"></div>
     <button class="btn btn-g" onclick="doLogin()" style="width:100%;padding:12px">Sign in</button>
     <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
   </div>
-  <div class="auth-form" id="signup-form" style="display:none">
+  <div class="auth-form" id="signup-form" style="display:none" novalidate>
     <div><label class="form-label">Family name</label><input id="signup-family" placeholder="e.g. The Gilberts" autocomplete="off"></div>
-    <div><label class="form-label">Email</label><input id="signup-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
+    <div><label class="form-label">Email</label><input id="signup-email" type="text" placeholder="you@email.com" autocomplete="off"></div>
     <div><label class="form-label">Password</label><input id="signup-password" type="password" placeholder="Choose a password" autocomplete="new-password"></div>
     <div class="auth-err" id="signup-err"></div>
     <button class="btn btn-g" onclick="doSignup()" style="width:100%;padding:12px">Create account</button>
