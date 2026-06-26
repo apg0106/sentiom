@@ -89,7 +89,7 @@ input::placeholder{color:#6B6D69}
     <div><label class="form-label">Password</label><input id="login-password" type="password" placeholder="Your password" autocomplete="current-password"></div>
     <div class="auth-err" id="login-err"></div>
     <button class="btn btn-g" onclick="doLogin()" style="width:100%;padding:12px">Sign in</button>
-    <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
+    <div style="text-align:center;margin-top:8px"><a onclick="showForgotPassword()" style="color:#6B6D69;font-size:13px;cursor:pointer">Forgot password?</a></div><div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
   </div>
   <div class="auth-form" id="signup-form" style="display:none" novalidate>
     <div><label class="form-label">Family name</label><input id="signup-family" placeholder="e.g. The Gilberts" autocomplete="off"></div>
