@@ -60,7 +60,7 @@ export async function onRequest(context) {
           <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px">sentiom<span style="color:#1D9E75">.</span></div>
           <div style="color:#6B6D69;margin-bottom:32px">Your family's financial home base</div>
           <h2 style="font-size:20px;font-weight:600;margin-bottom:12px">Welcome, ${family_name}!</h2>
-          <p style="color:#9A9C99;line-height:1.7;margin-bottom:24px">Your Sentiom account is ready. Here's a quick guide to get started:</p>
+          <p style="color:#9A9C99;line-height:1.7;margin-bottom:16px;font-style:italic;border-left:3px solid #1D9E75;padding-left:16px">De-automate your dollars. Somewhere between auto-pay bills and tap-to-pay lattes, we stopped looking at where our money actually goes. We let our financial habits slip into the background.<br><br>Welcome to Sentiom &mdash; the digital equivalent of a 90s pen-and-paper ledger. No bank syncing, no automatic categorization, and zero background noise. By forcing you to manually track every single dollar, we&rsquo;re bringing intentionality back to your wallet. It&rsquo;s time to take your money off autopilot.</p><p style="color:#9A9C99;line-height:1.7;margin-bottom:24px">Here&rsquo;s a quick guide to get started:</p>
           <div style="background:#101310;border:0.5px solid #1E221F;border-radius:10px;padding:20px;margin-bottom:16px">
             <div style="font-weight:600;margin-bottom:6px;color:#1D9E75">💰 Income</div>
             <div style="color:#9A9C99;font-size:14px;line-height:1.6">Log every paycheck, VA payment, or RSU vest as it hits your account. Use Previous Balance at the start of each month to carry over your checking balance.</div>
