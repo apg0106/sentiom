@@ -64,7 +64,7 @@ export async function onRequest(context) {
           <p style="color:#9A9C99;line-height:1.7;margin-bottom:24px">Here's a quick guide to get started:</p>
           <div style="background:#101310;border:0.5px solid #1E221F;border-radius:10px;padding:20px;margin-bottom:16px">
             <div style="font-weight:600;margin-bottom:6px;color:#1D9E75">💰 Income</div>
-            <div style="color:#9A9C99;font-size:14px;line-height:1.6">Log all income as it hits your account — paychecks, bonuses, side income, anything. You can also use Previous Balance at the start of each month to carry over your checking account balance.</div>
+            <div style="color:#9A9C99;font-size:14px;line-height:1.6">Log every paycheck, VA payment, or RSU vest as it hits your account. Use Previous Balance at the start of each month to carry over your checking balance.</div>
           </div>
           <div style="background:#101310;border:0.5px solid #1E221F;border-radius:10px;padding:20px;margin-bottom:16px">
             <div style="font-weight:600;margin-bottom:6px;color:#1D9E75">📋 Bills</div>
