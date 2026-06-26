@@ -25,7 +25,7 @@ export async function onRequest(context) {
           'Authorization': 'Bearer ' + env.RESEND_API_KEY,
         },
         body: JSON.stringify({
-          from: 'Sentiom <onboarding@resend.dev>',
+          from: 'Sentiom <hello@sentiom.app>',
           to,
           subject,
           html,
