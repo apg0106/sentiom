@@ -17,9 +17,7 @@ html,body{height:100%;background:#0F1110;color:#E8E8E6;font-family:-apple-system
 .month-nav button{background:none;border:none;color:#9A9C99;cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px}
 .month-nav button:active{background:#1E221F}
 #month-label{font-size:13px;font-weight:500;min-width:100px;text-align:center;color:#E8E8E6}
-.user-pills{display:flex;gap:6px}
-.upill{padding:4px 12px;font-size:12px;border-radius:100px;border:0.5px solid #2A2D2B;background:transparent;color:#9A9C99;cursor:pointer;transition:all 0.15s}
-.upill.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.user-info{font-size:12px;color:#9A9C99;cursor:pointer}
 .nav{display:flex;border-bottom:0.5px solid #1E221F;padding:0 16px;overflow-x:auto;gap:0;flex-shrink:0;background:#0F1110;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nav button{padding:10px 14px;font-size:12px;border:none;background:transparent;cursor:pointer;color:#6B6D69;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;transition:color 0.15s}
@@ -55,107 +53,88 @@ input::placeholder{color:#6B6D69}
 .badge-b{background:#0A2018;color:#1D9E75;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-o{background:#2A0A0A;color:#E24B4A;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-f{background:#1A1400;color:#EF9F27;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
-.badge-g{background:#0A1A0A;color:#5DC85D;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
-.badge-gr{background:#1A0A1A;color:#C85DC8;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .badge-i{background:#0A1A2A;color:#378ADD;padding:2px 7px;border-radius:100px;font-size:11px;white-space:nowrap}
 .log-entry{font-size:12px;color:#9A9C99;padding:5px 0;border-bottom:0.5px solid #1A1D1B;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .log-entry:last-child{border-bottom:none}
 .dp{color:#1D9E75;font-size:12px;font-weight:500;white-space:nowrap}
 .dn{color:#E24B4A;font-size:12px;font-weight:500;white-space:nowrap}
 .leak-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:6px 0}
-.free-card{border-color:#EF9F27 !important}
 .g{color:#1D9E75}.a{color:#BA7517}.r{color:#E24B4A}.b{color:#378ADD}.p{color:#7F77DD}.gold{color:#EF9F27}
 .form-grid{display:grid;gap:8px;margin-bottom:4px}
 .form-label{font-size:11px;color:#6B6D69;margin-bottom:4px;display:block}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid #1E221F;border-top-color:#1D9E75;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none}
 .toast.show{opacity:1}
-
-/* Login screen */
-.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
-.login-logo{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
-.login-logo span{color:#1D9E75}
-.login-sub{font-size:14px;color:#6B6D69;margin-bottom:40px;text-align:center}
-.login-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px}
-.login-err{color:#E24B4A;font-size:13px;text-align:center;min-height:18px}
+.auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.auth-logo{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.auth-logo span{color:#1D9E75}
+.auth-sub{font-size:14px;color:#6B6D69;margin-bottom:40px;text-align:center}
+.auth-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px}
+.auth-err{color:#E24B4A;font-size:13px;text-align:center;min-height:18px}
+.auth-switch{text-align:center;font-size:13px;color:#6B6D69;margin-top:8px}
+.auth-switch a{color:#1D9E75;cursor:pointer}
+.instr-section{margin-bottom:20px}
+.instr-title{font-size:15px;font-weight:600;color:#1D9E75;margin-bottom:8px}
+.instr-body{font-size:13px;color:#9A9C99;line-height:1.7}
+.instr-body b{color:#E8E8E6}
+.bill-grid{display:grid;grid-template-columns:1fr 55px 65px 30px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center}
 </style>
 </head>
 <body>
 
-<!-- Login screen -->
-<div class="login-screen" id="login-screen">
-  <div class="login-logo">sentiom<span>.</span></div>
-  <div class="login-sub">Your family's financial home base</div>
-  <div class="login-form">
-    <div>
-      <label class="form-label">Your name</label>
-      <input id="login-name" placeholder="e.g. John or Tabby" autocomplete="name">
-    </div>
-    <div>
-      <label class="form-label">Family passphrase</label>
-      <input id="login-pass" type="password" placeholder="Enter your passphrase" autocomplete="current-password">
-    </div>
-    <div class="login-err" id="login-err"></div>
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-logo">sentiom<span>.</span></div>
+  <div class="auth-sub" id="auth-sub">Your family's financial home base</div>
+  <div class="auth-form" id="login-form">
+    <div><label class="form-label">Email</label><input id="login-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
+    <div><label class="form-label">Password</label><input id="login-password" type="password" placeholder="Your password" autocomplete="current-password"></div>
+    <div class="auth-err" id="login-err"></div>
     <button class="btn btn-g" onclick="doLogin()" style="width:100%;padding:12px">Sign in</button>
+    <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
+  </div>
+  <div class="auth-form" id="signup-form" style="display:none">
+    <div><label class="form-label">Family name</label><input id="signup-family" placeholder="e.g. The Gilberts" autocomplete="off"></div>
+    <div><label class="form-label">Email</label><input id="signup-email" type="email" placeholder="you@email.com" autocomplete="email"></div>
+    <div><label class="form-label">Password</label><input id="signup-password" type="password" placeholder="Choose a password" autocomplete="new-password"></div>
+    <div class="auth-err" id="signup-err"></div>
+    <button class="btn btn-g" onclick="doSignup()" style="width:100%;padding:12px">Create account</button>
+    <div class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
   </div>
 </div>
 
-<!-- Main app -->
 <div class="app" id="main-app" style="display:none">
-
   <div class="topbar">
     <div class="logo">sentiom<span>.</span></div>
     <div class="month-nav">
-      <button onclick="prevMonth()" aria-label="previous month">‹</button>
+      <button onclick="prevMonth()">&#8249;</button>
       <span id="month-label"></span>
-      <button onclick="nextMonth()" aria-label="next month">›</button>
+      <button onclick="nextMonth()">&#8250;</button>
     </div>
-    <div class="user-pills">
-      <button class="upill active" id="pill-you" onclick="setUser(this)"></button>
-      <button class="upill" id="pill-other" onclick="setUser(this)" style="display:none"></button>
-    </div>
+    <div class="user-info" id="user-display" onclick="doLogout()">Sign out</div>
   </div>
-
   <div class="nav">
     <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
     <button onclick="showTab('income',this)">Income</button>
     <button onclick="showTab('bills',this)">Bills</button>
     <button onclick="showTab('transactions',this)">Transactions</button>
     <button onclick="showTab('goals',this)">Goals / Debts</button>
+    <button onclick="showTab('guide',this)">Guide</button>
   </div>
-
   <div class="body">
 
-    <!-- DASHBOARD -->
     <div id="tab-dashboard">
       <div class="metrics" id="dash-metrics"></div>
       <div class="two">
         <div>
-          <div class="card">
-            <div class="ctitle">Income this month</div>
-            <div id="dash-income"><div class="empty">No income logged yet.</div></div>
-          </div>
-          <div class="card">
-            <div class="ctitle">Bills — est vs actual</div>
-            <div id="dash-bills"></div>
-          </div>
+          <div class="card"><div class="ctitle">Income this month</div><div id="dash-income"><div class="empty">No income logged yet.</div></div></div>
+          <div class="card"><div class="ctitle">Bills - est vs actual</div><div id="dash-bills"></div></div>
         </div>
         <div>
-          <div class="card">
-            <div class="ctitle">Goals / debts</div>
-            <div id="dash-goals"></div>
-          </div>
-          <div class="card">
-            <div class="ctitle">Spending breakdown</div>
-            <div id="dash-spending"><div class="empty">No transactions yet.</div></div>
-          </div>
-
+          <div class="card"><div class="ctitle">Goals / debts</div><div id="dash-goals"></div></div>
+          <div class="card"><div class="ctitle">Spending breakdown</div><div id="dash-spending"><div class="empty">No transactions yet.</div></div></div>
         </div>
       </div>
     </div>
 
-    <!-- INCOME -->
     <div id="tab-income" style="display:none">
       <div class="card">
         <div class="ctitle">Log income</div>
@@ -163,11 +142,11 @@ input::placeholder{color:#6B6D69}
           <div><label class="form-label">Source</label><input id="inc-source" placeholder="e.g. Paycheck, RSU vest"></div>
           <div><label class="form-label">Amount</label><input id="inc-amount" type="number" placeholder="0.00"></div>
           <div><label class="form-label">Type</label>
-            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Other</option></select>
+            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Previous Balance</option><option>Other</option></select>
           </div>
           <div><label class="form-label">Date</label><input id="inc-date" type="date"></div>
         </div>
-        <button class="btn btn-g" onclick="addIncome()" style="width:100%;margin-top:4px">Add income</button>
+        <button class="btn btn-g" onclick="addIncome()" style="width:100%;margin-top:8px">Add income</button>
       </div>
       <div class="card">
         <div class="ctitle">Income log</div>
@@ -178,17 +157,16 @@ input::placeholder{color:#6B6D69}
       </div>
     </div>
 
-    <!-- BILLS -->
     <div id="tab-bills" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span style="font-size:12px;color:#6B6D69">Edit est. anytime. Enter actuals each month. Set Free Cash budget by editing its Est. amount.</span>
+        <span style="font-size:12px;color:#6B6D69">Edit est. anytime. Enter actuals each month.</span>
         <button class="btn" onclick="toggleForm('add-bill-form')">+ Add bill</button>
       </div>
       <div id="add-bill-form" style="display:none" class="card">
         <div class="ctitle">New bill</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr">
           <div><label class="form-label">Name</label><input id="nb-name" placeholder="e.g. Pool payment"></div>
-          <div><label class="form-label">Est. amount</label><input id="nb-est" type="number" placeholder="0"></div>
+          <div><label class="form-label">Est. amount</label><input id="nb-est" type="number"></div>
           <div><label class="form-label">Category</label>
             <select id="nb-cat"><option>Housing</option><option>Utilities</option><option>Transport</option><option>Food</option><option>Subscriptions</option><option>Other</option></select>
           </div>
@@ -196,17 +174,16 @@ input::placeholder{color:#6B6D69}
         </div>
       </div>
       <div class="card">
-        <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:11px;color:#6B6D69;font-weight:500;padding:4px 0;border-bottom:0.5px solid #1E221F;margin-bottom:4px">
-          <span>Bill</span><span>Cat.</span><span>Est.</span><span>Actual</span><span></span>
+        <div style="display:grid;grid-template-columns:1fr 55px 65px 30px;gap:6px;font-size:11px;color:#6B6D69;font-weight:500;padding:4px 0;border-bottom:0.5px solid #1E221F;margin-bottom:4px">
+          <span>Bill</span><span style="text-align:right">Est.</span><span style="text-align:right">Actual</span><span></span>
         </div>
         <div id="bills-list"></div>
-        <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:13px;font-weight:500;padding:8px 0 0;border-top:0.5px solid #1E221F;margin-top:4px">
-          <span class="rl">Total</span><span></span><span class="a" id="bills-est-total"></span><span class="r" id="bills-act-total"></span><span></span>
+        <div style="display:grid;grid-template-columns:1fr 55px 65px 30px;gap:6px;font-size:13px;font-weight:500;padding:8px 0 0;border-top:0.5px solid #1E221F;margin-top:4px">
+          <span class="rl">Total</span><span class="a" id="bills-est-total" style="text-align:right"></span><span class="r" id="bills-act-total" style="text-align:right"></span><span></span>
         </div>
       </div>
     </div>
 
-    <!-- TRANSACTIONS -->
     <div id="tab-transactions" style="display:none">
       <div class="card">
         <div class="ctitle">Log a transaction</div>
@@ -224,41 +201,75 @@ input::placeholder{color:#6B6D69}
             </select>
           </div>
         </div>
-        <button class="btn btn-g" onclick="addTx()" style="width:100%;margin-top:4px">Add transaction</button>
+        <button class="btn btn-g" onclick="addTx()" style="width:100%;margin-top:8px">Add transaction</button>
       </div>
-
-
-
       <div class="card">
         <div class="ctitle">All transactions</div>
         <div id="tx-list"><div class="empty">No transactions this month.</div></div>
       </div>
-
       <div class="card">
         <div class="ctitle">Off-budget leak</div>
         <div id="leak-view"><div class="empty">No off-budget spending this month.</div></div>
       </div>
     </div>
 
-    <!-- GOALS / DEBTS -->
     <div id="tab-goals" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="font-size:12px;color:#6B6D69">Edit balance and target directly. Log extra payments with +/−.</span>
+        <span style="font-size:12px;color:#6B6D69">Edit balance and target directly. Log extra payments with +/-.</span>
         <button class="btn" onclick="toggleForm('add-goal-form')">+ Add</button>
       </div>
       <div id="add-goal-form" style="display:none" class="card">
         <div class="ctitle">New goal or debt</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr">
           <div><label class="form-label">Name</label><input id="ng-name" placeholder="e.g. Pool fund, Car loan"></div>
-          <div><label class="form-label">Type</label>
-            <select id="ng-type"><option value="savings">Savings goal</option><option value="debt">Debt payoff</option></select>
-          </div>
+          <div><label class="form-label">Type</label><select id="ng-type"><option value="savings">Savings goal</option><option value="debt">Debt payoff</option></select></div>
           <div><label class="form-label">Current balance / saved</label><input id="ng-current" type="number" placeholder="0"></div>
           <div><label class="form-label">Target amount</label><input id="ng-target" type="number" placeholder="0"></div>
         </div>
-        <button class="btn btn-g" onclick="addGoal()" style="width:100%;margin-top:4px">Add</button>
+        <button class="btn btn-g" onclick="addGoal()" style="width:100%;margin-top:8px">Add</button>
       </div>
       <div id="goals-list"></div>
+    </div>
+
+    <div id="tab-guide" style="display:none">
+      <div class="card">
+        <div class="instr-section">
+          <div class="instr-title">Dashboard</div>
+          <div class="instr-body">Your financial overview for the current month. Shows a <b>ledger balance</b> (income minus bills paid minus transactions), income summary, bills estimated vs actual, goals progress, and spending breakdown. Navigate months using the arrows at the top.</div>
+        </div>
+        <div class="instr-section">
+          <div class="instr-title">Income</div>
+          <div class="instr-body">Log every paycheck, VA payment, RSU vest, or bonus as it hits your account. Use <b>Previous Balance</b> at the start of each month to carry over your checking account balance. The total updates the ledger balance automatically.</div>
+        </div>
+        <div class="instr-section">
+          <div class="instr-title">Bills</div>
+          <div class="instr-body">Your fixed monthly bills. <b>Est.</b> is your baseline - edit anytime. <b>Actual</b> is what you fill in each month as bills are paid. Gas and Groceries actuals update automatically when you log those transaction types. Add new bills with + Add bill. Remove old bills with the x button.</div>
+        </div>
+        <div class="instr-section">
+          <div class="instr-title">Transactions</div>
+          <div class="instr-body">Log every purchase here. Types:<br><br>
+          <b>Budgeted</b> - planned spending<br>
+          <b>Off-budget</b> - unplanned, shows in leak tracker<br>
+          <b>Free Spend</b> - fun money<br>
+          <b>Gas</b> - auto-updates Gas actual in Bills<br>
+          <b>Groceries</b> - auto-updates Groceries actual in Bills<br><br>
+          All types subtract from your ledger balance.</div>
+        </div>
+        <div class="instr-section">
+          <div class="instr-title">Goals / Debts</div>
+          <div class="instr-body">Track savings goals and debt payoffs. <b>Tap the balance number to edit it directly</b> - update your debt balance when your statement arrives. Use + Add to log extra contributions or payments with a note.</div>
+        </div>
+        <div class="instr-section" style="margin-bottom:0">
+          <div class="instr-title">Tips</div>
+          <div class="instr-body">
+          - Log income on the day it hits your account<br>
+          - Start each month by logging your checking balance as Previous Balance<br>
+          - Update debt balances once a month when statements arrive<br>
+          - The ledger balance should roughly match your checking account<br>
+          - Gas and Groceries auto-track to Bills when logged as transactions
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -268,434 +279,444 @@ input::placeholder{color:#6B6D69}
 
 <script>
 const COLORS=['#1D9E75','#BA7517','#378ADD','#7F77DD','#E24B4A','#0F6E56','#854F0B']
-let AUTH='',USER='',OTHER_USER=''
+let SESSION_TOKEN='',USER_NAME='',USER_ID=''
 let viewYear=new Date().getFullYear(),viewMonth=new Date().getMonth()
 let bills=[],billActuals={},goals=[],transactions=[],incomeLog=[]
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function fmt(n){return'$'+Math.round(n).toLocaleString()}
 function fmtD(n){return'$'+parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function mKey(){return`${viewYear}-${viewMonth}`}
+function mKey(){return viewYear+'-'+viewMonth}
 function monthStr(){return new Date(viewYear,viewMonth,1).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
 function today(){return new Date().toISOString().split('T')[0]}
 
-async function api(path,method='GET',body=null){
-  const opts={method,headers:{'Content-Type':'application/json'}}
-  if(body)opts.body=JSON.stringify(body)
-  const res=await fetch('/api'+path,opts)
-  if(!res.ok)throw new Error('API error '+res.status)
-  return res.json()
+function setCookie(name,value,days){
+  var d=new Date();d.setTime(d.getTime()+(days*24*60*60*1000));
+  document.cookie=name+'='+value+';expires='+d.toUTCString()+';path=/;SameSite=Lax'
+}
+function getCookie(name){
+  var v=document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+  return v?v.pop():''
+}
+function deleteCookie(name){document.cookie=name+'=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/'}
+
+async function api(path,method,body){
+  method=method||'GET';
+  var opts={method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+SESSION_TOKEN}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch('/api'+path,opts);
+  var data=await res.json();
+  if(!res.ok)throw new Error(data.error||'API error');
+  return data
+}
+async function apiNoAuth(path,method,body){
+  var opts={method:method||'POST',headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch('/api'+path,opts);
+  var data=await res.json();
+  if(!res.ok)throw new Error(data.error||'API error');
+  return data
 }
 
-function showToast(msg,isErr=false){
-  const t=document.getElementById('toast')
-  t.textContent=msg
-  t.style.background=isErr?'#A32D2D':'#1D9E75'
-  t.classList.add('show')
-  setTimeout(()=>t.classList.remove('show'),2200)
+function showToast(msg,isErr){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=isErr?'#A32D2D':'#1D9E75';
+  t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)
 }
 
-// ── AUTH ──────────────────────────────────────────────────────────
-const FAMILY_PIN = 'Douglas0907'
+function showSignup(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('signup-form').style.display='flex';
+  document.getElementById('auth-sub').textContent='Create your family account'
+}
+function showLogin(){
+  document.getElementById('signup-form').style.display='none';
+  document.getElementById('login-form').style.display='flex';
+  document.getElementById('auth-sub').textContent="Your family's financial home base"
+}
+
 async function doLogin(){
-  const name=document.getElementById('login-name').value.trim()
-  const pass=document.getElementById('login-pass').value.trim()
-  const err=document.getElementById('login-err')
-  if(!name){err.textContent='Please enter your name';return}
-  if(!pass){err.textContent='Please enter the passphrase';return}
-  if(pass !== FAMILY_PIN){err.textContent='Wrong passphrase — try again';return}
-  err.textContent=''
-  USER=name
-  sessionStorage.setItem('sentiom_user',name)
-  startApp()
+  var email=document.getElementById('login-email').value.trim();
+  var password=document.getElementById('login-password').value;
+  var err=document.getElementById('login-err');
+  err.textContent='';
+  if(!email||!password){err.textContent='Please fill in all fields';return}
+  try{
+    var data=await apiNoAuth('/login','POST',{email:email,password:password});
+    SESSION_TOKEN=data.token;USER_NAME=data.family_name;USER_ID=data.user_id;
+    setCookie('sentiom_token',data.token,30);
+    setCookie('sentiom_name',data.family_name,30);
+    setCookie('sentiom_uid',data.user_id,30);
+    startApp()
+  }catch(e){err.textContent=e.message||'Login failed'}
 }
 
-document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
+async function doSignup(){
+  var family_name=document.getElementById('signup-family').value.trim();
+  var email=document.getElementById('signup-email').value.trim();
+  var password=document.getElementById('signup-password').value;
+  var err=document.getElementById('signup-err');
+  err.textContent='';
+  if(!family_name||!email||!password){err.textContent='Please fill in all fields';return}
+  if(password.length<6){err.textContent='Password must be at least 6 characters';return}
+  try{
+    var data=await apiNoAuth('/signup','POST',{email:email,password:password,family_name:family_name});
+    SESSION_TOKEN=data.token;USER_NAME=data.family_name;USER_ID=data.user_id;
+    setCookie('sentiom_token',data.token,30);
+    setCookie('sentiom_name',data.family_name,30);
+    setCookie('sentiom_uid',data.user_id,30);
+    startApp()
+  }catch(e){err.textContent=e.message||'Signup failed'}
+}
+
+function doLogout(){
+  if(!confirm('Sign out?'))return;
+  deleteCookie('sentiom_token');deleteCookie('sentiom_name');deleteCookie('sentiom_uid');
+  SESSION_TOKEN='';USER_NAME='';USER_ID='';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  showLogin()
+}
 
 function startApp(){
-  document.getElementById('login-screen').style.display='none'
-  document.getElementById('main-app').style.display='flex'
-  document.getElementById('pill-you').textContent=USER
-  document.getElementById('tx-date').value=today()
-  document.getElementById('inc-date').value=today()
-  updateMonthLabel()
-  loadAll()
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('main-app').style.display='flex';
+  document.getElementById('user-display').textContent=USER_NAME+' - Sign out';
+  document.getElementById('tx-date').value=today();
+  document.getElementById('inc-date').value=today();
+  updateMonthLabel();loadAll()
 }
 
-function setUser(btn){
-  document.querySelectorAll('.upill').forEach(b=>b.classList.remove('active'))
-  btn.classList.add('active')
-  USER=btn.textContent
-}
+function updateMonthLabel(){document.getElementById('month-label').textContent=monthStr()}
+function prevMonth(){if(viewMonth===0){viewMonth=11;viewYear--}else viewMonth--;loadAll()}
+function nextMonth(){if(viewMonth===11){viewMonth=0;viewYear++}else viewMonth++;loadAll()}
 
-// ── MONTH NAV ────────────────────────────────────────────────────
-function updateMonthLabel(){
-  document.getElementById('month-label').textContent=monthStr()
-  const t=document.getElementById('tx-month-label2');if(t)t.textContent=monthStr()
-}
-function prevMonth(){viewMonth===0?(viewMonth=11,viewYear--):(viewMonth--);loadAll()}
-function nextMonth(){viewMonth===11?(viewMonth=0,viewYear++):(viewMonth++);loadAll()}
-
-// ── LOAD DATA ────────────────────────────────────────────────────
 async function loadAll(){
-  updateMonthLabel()
+  updateMonthLabel();
   try{
-    const mk=mKey()
-    const[txData,incData,billData,billActData,goalData]=await Promise.all([
+    var mk=mKey();
+    var results=await Promise.all([
       api('/transactions?month_key='+mk),
       api('/income?month_key='+mk),
       api('/bills'),
       api('/bill-actuals?month_key='+mk),
-      api('/goals'),
-    ])
-    transactions=txData
-    incomeLog=incData
-    bills=billData
-    billActuals={}
-    billActData.forEach(b=>{billActuals[b.bill_id]=b.actual})
-    goals=goalData
-    renderAll()
-  }catch(e){console.error('loadAll error:',e);showToast('Error: '+e.message,true)}
+      api('/goals')
+    ]);
+    transactions=results[0];incomeLog=results[1];bills=results[2];
+    billActuals={};results[3].forEach(function(b){billActuals[b.bill_id]=b.actual});
+    goals=results[4];renderAll()
+  }catch(e){showToast('Connection error',true)}
 }
 
-// ── TAB ROUTING ──────────────────────────────────────────────────
 function showTab(id,btn){
-  ['dashboard','income','bills','transactions','goals'].forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'':'none')
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'))
-  btn.classList.add('active')
-  renderAll()
+  ['dashboard','income','bills','transactions','goals','guide'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display=t===id?'':'none'
+  });
+  document.querySelectorAll('.nav button').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');renderAll()
 }
-function toggleForm(id){const f=document.getElementById(id);f.style.display=f.style.display==='none'?'':'none'}
+function toggleForm(id){var f=document.getElementById(id);f.style.display=f.style.display==='none'?'':'none'}
 function renderAll(){renderDash();renderIncome();renderBills();renderTx();renderGoals()}
 
-// ── DASHBOARD ────────────────────────────────────────────────────
 function renderDash(){
-  const totalInc=incomeLog.reduce((s,i)=>s+i.amount,0)
-  const estBills=bills.reduce((s,b)=>s+b.est,0)
-  // Only subtract bills where actual has been entered
-  const actBillsEntered=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:0),0)
-  const actBills=bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0)
-  const offAmt=transactions.filter(t=>t.type==='off-budget').reduce((s,t)=>s+t.amount,0)
-  const budAmt=transactions.filter(t=>t.type==='budgeted').reduce((s,t)=>s+t.amount,0)
-  const freeAmt=transactions.filter(t=>t.type==='free-spend').reduce((s,t)=>s+t.amount,0)
-  const gasAmt=transactions.filter(t=>t.type==='gas').reduce((s,t)=>s+t.amount,0)
-  const grocAmt=transactions.filter(t=>t.type==='groceries').reduce((s,t)=>s+t.amount,0)
-  const allTxAmt=offAmt+budAmt+freeAmt+gasAmt+grocAmt
-  // Ledger = all income - bills actually entered - all transactions
-  const ledgerBalance=totalInc-actBillsEntered-allTxAmt
-  // Free Cash = find Free Cash bill est - free spend transactions
-  const freeCashBill=bills.find(b=>b.name==='Free Cash')
-  const freeCashBudget=freeCashBill?freeCashBill.est:1000
-  const remainingFreeCash=freeCashBudget-freeAmt
-  document.getElementById('dash-metrics').innerHTML=`
-    <div class="metric" style="grid-column:span 2;background:#0A1A12;border:0.5px solid #1D9E75">
-      <div class="mlabel" style="color:#1D9E75">Ledger balance</div>
-      <div class="mval" style="font-size:28px;color:${ledgerBalance>=0?'#1D9E75':'#E24B4A'}">${fmt(ledgerBalance)}</div>
-      <div style="font-size:11px;color:#6B6D69;margin-top:4px">${fmt(totalInc)} in · ${fmt(actBillsEntered)} bills · ${fmt(allTxAmt)} transactions</div>
-    </div>
-    <div class="metric"><div class="mlabel">Income logged</div><div class="mval g">${fmt(totalInc)}</div></div>
-    <div class="metric"><div class="mlabel">Bills paid</div><div class="mval a">${fmt(actBillsEntered)}</div></div>
-    <div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">${fmt(offAmt)}</div></div>
-    <div class="metric" style="background:#1A1400;border:0.5px solid #EF9F27"><div class="mlabel" style="color:#EF9F27">Remaining free cash</div><div class="mval gold">${fmt(remainingFreeCash)}</div><div style="font-size:11px;color:#6B6D69;margin-top:2px">${fmt(freeCashBudget)} budget · ${fmt(freeAmt)} spent</div></div>`
+  var totalInc=incomeLog.reduce(function(s,i){return s+i.amount},0);
+  var estBills=bills.reduce(function(s,b){return s+b.est},0);
+  var actBills=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est)},0);
+  var billsPaid=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:0)},0);
+  var offAmt=transactions.filter(function(t){return t.type==='off-budget'}).reduce(function(s,t){return s+t.amount},0);
+  var budAmt=transactions.filter(function(t){return t.type==='budgeted'}).reduce(function(s,t){return s+t.amount},0);
+  var freeAmt=transactions.filter(function(t){return t.type==='free-spend'}).reduce(function(s,t){return s+t.amount},0);
+  var gasAmt=transactions.filter(function(t){return t.type==='gas'}).reduce(function(s,t){return s+t.amount},0);
+  var grocAmt=transactions.filter(function(t){return t.type==='groceries'}).reduce(function(s,t){return s+t.amount},0);
+  var allTx=offAmt+budAmt+freeAmt+gasAmt+grocAmt;
+  var ledger=totalInc-billsPaid-allTx;
 
-  const di=document.getElementById('dash-income')
+  document.getElementById('dash-metrics').innerHTML=
+    '<div class="metric" style="grid-column:span 2;background:#0A1A12;border:0.5px solid #1D9E75">'+
+      '<div class="mlabel" style="color:#1D9E75">Ledger balance</div>'+
+      '<div class="mval" style="font-size:26px;color:'+(ledger>=0?'#1D9E75':'#E24B4A')+'">'+fmt(ledger)+'</div>'+
+      '<div style="font-size:11px;color:#6B6D69;margin-top:3px">'+fmt(totalInc)+' in - '+fmt(billsPaid)+' bills - '+fmt(allTx)+' transactions</div>'+
+    '</div>'+
+    '<div class="metric"><div class="mlabel">Income logged</div><div class="mval g">'+fmt(totalInc)+'</div></div>'+
+    '<div class="metric"><div class="mlabel">Bills paid</div><div class="mval a">'+fmt(billsPaid)+'</div></div>'+
+    '<div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">'+fmt(offAmt)+'</div></div>'+
+    '<div class="metric"><div class="mlabel">All transactions</div><div class="mval">'+fmt(allTx)+'</div></div>';
+
+  var di=document.getElementById('dash-income');
   if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
   else{
-    const bt={};incomeLog.forEach(i=>{bt[i.type]=(bt[i.type]||0)+i.amount})
-    di.innerHTML=Object.entries(bt).map(([t,v])=>`<div class="row"><span class="rl">${t}</span><span class="rv g">${fmt(v)}</span></div>`).join('')+
-    `<div class="row"><span class="rl" style="font-weight:500;color:#E8E8E6">Total</span><span class="rv g">${fmt(totalInc)}</span></div>`}
+    var bt={};incomeLog.forEach(function(i){bt[i.type]=(bt[i.type]||0)+i.amount});
+    di.innerHTML=Object.entries(bt).map(function(e){return'<div class="row"><span class="rl">'+e[0]+'</span><span class="rv g">'+fmt(e[1])+'</span></div>'}).join('')+
+    '<div class="row"><span class="rl" style="font-weight:500;color:#E8E8E6">Total</span><span class="rv g">'+fmt(totalInc)+'</span></div>'
+  }
 
-  const cats={};bills.forEach(b=>{const a=billActuals[b.id]!==undefined?billActuals[b.id]:b.est;cats[b.cat]=cats[b.cat]||{est:0,act:0};cats[b.cat].est+=b.est;cats[b.cat].act+=a})
-  document.getElementById('dash-bills').innerHTML=Object.entries(cats).map(([c,v])=>`
-    <div class="row"><span class="rl">${c}</span><span style="font-size:11px;color:#6B6D69;min-width:60px;text-align:right">${fmt(v.est)}</span><span class="rv ${v.act>v.est?'r':''}" style="min-width:70px;text-align:right">${fmt(v.act)}</span></div>`).join('')+
-    `<div class="row"><span class="rl" style="font-weight:500;color:#E8E8E6">Total</span><span style="font-size:11px;color:#6B6D69;min-width:60px;text-align:right">${fmt(estBills)}</span><span class="rv r" style="min-width:70px;text-align:right">${fmt(actBills)}</span></div>`
+  var cats={};
+  bills.forEach(function(b){
+    var a=billActuals[b.id]!==undefined?billActuals[b.id]:b.est;
+    if(!cats[b.cat])cats[b.cat]={est:0,act:0};
+    cats[b.cat].est+=b.est;cats[b.cat].act+=a
+  });
+  document.getElementById('dash-bills').innerHTML=Object.entries(cats).sort().map(function(e){
+    var c=e[0],v=e[1];
+    return'<div style="display:grid;grid-template-columns:1fr 65px 65px;gap:4px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;font-size:13px">'+
+      '<span class="rl">'+c+'</span>'+
+      '<span style="font-size:11px;color:#6B6D69;text-align:right">'+fmt(v.est)+'</span>'+
+      '<span class="rv '+(v.act>v.est?'r':'')+'" style="text-align:right">'+fmt(v.act)+'</span>'+
+    '</div>'}).join('')+
+    '<div style="display:grid;grid-template-columns:1fr 65px 65px;gap:4px;padding:6px 0;font-size:13px;font-weight:500">'+
+      '<span style="color:#E8E8E6">Total</span>'+
+      '<span style="font-size:11px;color:#6B6D69;text-align:right">'+fmt(estBills)+'</span>'+
+      '<span class="rv r" style="text-align:right">'+fmt(actBills)+'</span>'+
+    '</div>';
 
-  document.getElementById('dash-goals').innerHTML=goals.map(g=>{
-    const pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100))
-    return`<div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:#9A9C99;margin-bottom:3px">
-        <span>${g.name}</span><span>${g.type==='debt'?fmt(Math.max(0,g.current))+' left':fmt(g.current)+' / '+fmt(g.target)}</span>
-      </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${g.color}"></div></div>
-    </div>`}).join('')
+  document.getElementById('dash-goals').innerHTML=goals.map(function(g){
+    var pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100));
+    return'<div style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;color:#9A9C99;margin-bottom:3px">'+
+        '<span>'+g.name+'</span><span>'+(g.type==='debt'?fmt(Math.max(0,g.current))+' left':fmt(g.current)+' / '+fmt(g.target))+'</span>'+
+      '</div>'+
+      '<div class="prog-track"><div class="prog-fill" style="width:'+pct+'%;background:'+g.color+'"></div></div>'+
+    '</div>'}).join('')||'<div class="empty">No goals yet.</div>';
 
-  const tot=offAmt+budAmt+freeAmt
-  const ds=document.getElementById('dash-spending')
+  var tot=allTx;
+  var ds=document.getElementById('dash-spending');
   if(!tot){ds.innerHTML='<div class="empty">No transactions yet.</div>'}
   else{
-    const bp=Math.round(budAmt/tot*100),op=Math.round(offAmt/tot*100),fp=100-bp-op
-    ds.innerHTML=`<div style="font-size:12px;color:#9A9C99;margin-bottom:5px">${fmtD(tot)} logged</div>
-    <div class="leak-bar"><div style="width:${bp}%;background:#1D9E75"></div><div style="width:${op}%;background:#E24B4A"></div><div style="width:${fp}%;background:#EF9F27"></div></div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#9A9C99">
-      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#1D9E75;margin-right:3px"></span>Budgeted ${fmt(budAmt)}</span>
-      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#E24B4A;margin-right:3px"></span>Off-budget ${fmt(offAmt)}</span>
-      <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#EF9F27;margin-right:3px"></span>Free spend ${fmt(freeAmt)}</span>
-    </div>`}
-
+    var bp=Math.round(budAmt/tot*100),op=Math.round(offAmt/tot*100),fp=100-bp-op;
+    ds.innerHTML='<div style="font-size:12px;color:#9A9C99;margin-bottom:5px">'+fmtD(tot)+' logged</div>'+
+    '<div class="leak-bar"><div style="width:'+bp+'%;background:#1D9E75"></div><div style="width:'+op+'%;background:#E24B4A"></div><div style="width:'+fp+'%;background:#EF9F27"></div></div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#9A9C99">'+
+      '<span>Budgeted '+fmt(budAmt)+'</span>'+
+      '<span>Off-budget '+fmt(offAmt)+'</span>'+
+      '<span>Free spend '+fmt(freeAmt)+'</span>'+
+    '</div>'
+  }
 }
 
-
-
-
-
-// ── INCOME ───────────────────────────────────────────────────────
 async function addIncome(){
-  const src=document.getElementById('inc-source').value.trim()
-  const amt=parseFloat(document.getElementById('inc-amount').value)
-  const type=document.getElementById('inc-type').value
-  const date=document.getElementById('inc-date').value
+  var src=document.getElementById('inc-source').value.trim();
+  var amt=parseFloat(document.getElementById('inc-amount').value);
+  var type=document.getElementById('inc-type').value;
+  var date=document.getElementById('inc-date').value;
   if(!src||isNaN(amt)||amt<=0||!date){showToast('Fill in all fields',true);return}
-  const entry={id:uid(),source:src,amount:amt,type,date,logged_by:USER,month_key:mKey()}
+  var entry={id:uid(),source:src,amount:amt,type:type,date:date,logged_by:USER_NAME,month_key:mKey()};
   try{
-    await api('/income','POST',entry)
-    incomeLog.unshift(entry)
-    document.getElementById('inc-source').value=''
-    document.getElementById('inc-amount').value=''
-    showToast('Income logged')
-    renderAll()
+    await api('/income','POST',entry);
+    incomeLog.unshift(entry);
+    document.getElementById('inc-source').value='';
+    document.getElementById('inc-amount').value='';
+    showToast('Income logged');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
-
 async function deleteIncome(id){
-  try{await api('/income/'+id,'DELETE');incomeLog=incomeLog.filter(i=>i.id!==id);renderAll()}
+  try{await api('/income/'+id,'DELETE');incomeLog=incomeLog.filter(function(i){return i.id!==id});renderAll()}
   catch(e){showToast('Could not delete',true)}
 }
-
 function renderIncome(){
-  const el=document.getElementById('inc-list')
+  var el=document.getElementById('inc-list');
   el.innerHTML=!incomeLog.length?'<div class="empty">No income logged this month.</div>':
-    incomeLog.map(i=>`<div style="display:grid;grid-template-columns:1fr 70px 90px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
-      <span>${i.source}</span><span class="g" style="font-weight:500">${fmtD(i.amount)}</span>
-      <span><span class="badge-i">${i.type}</span></span>
-      <button onclick="deleteIncome('${i.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
-    </div>`).join('')
-  document.getElementById('inc-total-val').textContent=fmtD(incomeLog.reduce((s,i)=>s+i.amount,0))
+    incomeLog.map(function(i){return'<div style="display:grid;grid-template-columns:1fr 80px 90px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
+      '<span>'+i.source+'</span><span class="g" style="font-weight:500">'+fmtD(i.amount)+'</span>'+
+      '<span><span class="badge-i">'+i.type+'</span></span>'+
+      '<button onclick="deleteIncome(\''+i.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px">x</button>'+
+    '</div>'}).join('');
+  document.getElementById('inc-total-val').textContent=fmtD(incomeLog.reduce(function(s,i){return s+i.amount},0))
 }
 
-// ── BILLS ────────────────────────────────────────────────────────
 async function addBill(){
-  const name=document.getElementById('nb-name').value.trim()
-  const est=parseFloat(document.getElementById('nb-est').value)
-  const cat=document.getElementById('nb-cat').value
+  var name=document.getElementById('nb-name').value.trim();
+  var est=parseFloat(document.getElementById('nb-est').value);
+  var cat=document.getElementById('nb-cat').value;
   if(!name||isNaN(est)){showToast('Fill in all fields',true);return}
-  const bill={id:uid(),name,est,cat}
+  var bill={id:uid(),name:name,est:est,cat:cat};
   try{
-    await api('/bills','POST',bill)
-    bills.push(bill)
-    document.getElementById('nb-name').value=''
-    document.getElementById('nb-est').value=''
-    document.getElementById('add-bill-form').style.display='none'
-    showToast('Bill added')
-    renderAll()
+    await api('/bills','POST',bill);
+    bills.push(bill);
+    document.getElementById('nb-name').value='';
+    document.getElementById('nb-est').value='';
+    document.getElementById('add-bill-form').style.display='none';
+    showToast('Bill added');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
-
 async function deleteBill(id){
-  try{await api('/bills/'+id,'DELETE');bills=bills.filter(b=>b.id!==id);renderAll();showToast('Bill removed')}
+  try{await api('/bills/'+id,'DELETE');bills=bills.filter(function(b){return b.id!==id});renderAll();showToast('Bill removed')}
   catch(e){showToast('Could not delete',true)}
 }
-
 async function updateBillEst(id,val){
-  const v=parseFloat(val);const b=bills.find(b=>b.id===id);if(!b||isNaN(v))return
-  b.est=v
+  var v=parseFloat(val);var b=bills.find(function(b){return b.id===id});if(!b||isNaN(v))return;
+  b.est=v;
   try{await api('/bills/'+id,'PUT',{name:b.name,est:v,cat:b.cat});renderDash()}
   catch(e){showToast('Could not save',true)}
 }
-
 async function updateBillActual(id,val){
-  const v=parseFloat(val)
+  var v=parseFloat(val);
   if(isNaN(v)||v<0){delete billActuals[id];renderDash();return}
-  billActuals[id]=v
+  billActuals[id]=v;
   try{await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:v});renderDash()}
   catch(e){showToast('Could not save',true)}
 }
-
 function renderBills(){
-  const mk=mKey()
-  document.getElementById('bills-list').innerHTML=bills.map(b=>`
-    <div style="display:grid;grid-template-columns:1fr 55px 65px 65px 24px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
-      <span class="rl" style="font-size:12px">${b.name}</span>
-      <span style="font-size:10px;color:#6B6D69">${b.cat}</span>
-      <input class="inp-sm" type="number" value="${b.est}" onchange="updateBillEst('${b.id}',this.value)" style="width:100%;text-align:right">
-      <input class="inp-sm" type="number" placeholder="${b.est}" value="${billActuals[b.id]!==undefined?billActuals[b.id]:''}" oninput="updateBillActual('${b.id}',this.value)" style="width:100%;text-align:right">
-      <button onclick="deleteBill('${b.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0" aria-label="delete">✕</button>
-    </div>`).join('')
-  document.getElementById('bills-est-total').textContent=fmt(bills.reduce((s,b)=>s+b.est,0))
-  document.getElementById('bills-act-total').textContent=fmt(bills.reduce((s,b)=>s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est),0))
+  var sorted=[].concat(bills).sort(function(a,b){return a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name)});
+  document.getElementById('bills-list').innerHTML=sorted.map(function(b){return'<div class="bill-grid">'+
+    '<span class="rl" style="font-size:12px">'+b.name+'</span>'+
+    '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
+    '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" oninput="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
+    '<button onclick="deleteBill(\''+b.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0">x</button>'+
+  '</div>'}).join('');
+  document.getElementById('bills-est-total').textContent=fmt(bills.reduce(function(s,b){return s+b.est},0));
+  document.getElementById('bills-act-total').textContent=fmt(bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est)},0))
 }
 
-// ── TRANSACTIONS ─────────────────────────────────────────────────
 async function addTx(){
-  const m=document.getElementById('tx-merchant').value.trim()
-  const a=parseFloat(document.getElementById('tx-amount').value)
-  const d=document.getElementById('tx-date').value
-  const t=document.getElementById('tx-type').value
+  var m=document.getElementById('tx-merchant').value.trim();
+  var a=parseFloat(document.getElementById('tx-amount').value);
+  var d=document.getElementById('tx-date').value;
+  var t=document.getElementById('tx-type').value;
   if(!m||isNaN(a)||a<=0||!d){showToast('Fill in all fields',true);return}
-  const tx={id:uid(),merchant:m,amount:a,date:d,type:t,logged_by:USER,month_key:mKey()}
+  var tx={id:uid(),merchant:m,amount:a,date:d,type:t,logged_by:USER_NAME,month_key:mKey()};
   try{
-    await api('/transactions','POST',tx)
-    transactions.unshift(tx)
-    // Auto-update bill actuals for gas, groceries, free-spend
+    await api('/transactions','POST',tx);
+    transactions.unshift(tx);
     if(t==='gas'||t==='groceries'||t==='free-spend'){
-      const billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Free Cash'
-      const bill=bills.find(b=>b.name===billName)
+      var billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Free Cash';
+      var bill=bills.find(function(b){return b.name===billName});
       if(bill){
-        const currentActual=billActuals[bill.id]||0
-        const newActual=currentActual+a
-        billActuals[bill.id]=newActual
+        var newActual=parseFloat(((billActuals[bill.id]||0)+a).toFixed(2));
+        billActuals[bill.id]=newActual;
         await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
       }
     }
-    document.getElementById('tx-merchant').value=''
-    document.getElementById('tx-amount').value=''
-    showToast('Transaction logged')
-    renderAll()
+    document.getElementById('tx-merchant').value='';
+    document.getElementById('tx-amount').value='';
+    showToast('Transaction logged');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
-
 async function deleteTx(id){
-  try{await api('/transactions/'+id,'DELETE');transactions=transactions.filter(t=>t.id!==id);renderAll()}
+  try{await api('/transactions/'+id,'DELETE');transactions=transactions.filter(function(t){return t.id!==id});renderAll()}
   catch(e){showToast('Could not delete',true)}
 }
-
 function renderTx(){
-  const el=document.getElementById('tx-list')
+  var el=document.getElementById('tx-list');
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
-    transactions.map(t=>`<div style="display:grid;grid-template-columns:1fr 65px 80px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">
-      <span style="font-size:12px">${t.merchant}</span><span style="font-weight:500">${fmtD(t.amount)}</span>
-      <span><span class="${t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='free-spend'?'badge-f':t.type==='gas'?'badge-g':'badge-gr'}">${t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='free-spend'?'Free Spend':t.type==='gas'?'Gas':'Groceries'}</span></span>
-      <span style="color:#9A9C99;font-size:11px">${t.logged_by}</span>
-      <button onclick="deleteTx('${t.id}')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px" aria-label="delete">✕</button>
-    </div>`).join('')
-
-
-
-  const off=transactions.filter(t=>t.type==='off-budget')
+    transactions.map(function(t){
+      var badgeClass=t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='free-spend'?'badge-f':'badge-b';
+      var badgeStyle=t.type==='gas'||t.type==='groceries'?'background:#0A2A0A;color:#5DC85D':'';
+      var badgeText=t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='free-spend'?'Free Spend':t.type==='gas'?'Gas':'Groceries';
+      return'<div style="display:grid;grid-template-columns:1fr 65px 90px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
+        '<span style="font-size:12px">'+t.merchant+'</span>'+
+        '<span style="font-weight:500">'+fmtD(t.amount)+'</span>'+
+        '<span><span class="'+badgeClass+'" style="'+badgeStyle+'">'+badgeText+'</span></span>'+
+        '<span style="color:#9A9C99;font-size:11px">'+t.logged_by+'</span>'+
+        '<button onclick="deleteTx(\''+t.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px">x</button>'+
+      '</div>'}).join('');
+  var off=transactions.filter(function(t){return t.type==='off-budget'});
   document.getElementById('leak-view').innerHTML=!off.length?'<div class="empty">No off-budget spending this month.</div>':
-    `<div class="row"><span class="rl">Count</span><span class="rv">${off.length}</span></div>
-     <div class="row"><span class="rl">Total</span><span class="rv r">${fmtD(off.reduce((s,t)=>s+t.amount,0))}</span></div>
-     ${off.map(t=>`<div class="row"><span class="rl" style="font-size:12px">${t.merchant}</span><span class="rv">${fmtD(t.amount)}</span></div>`).join('')}`
-
-
+    '<div class="row"><span class="rl">Count</span><span class="rv">'+off.length+'</span></div>'+
+    '<div class="row"><span class="rl">Total</span><span class="rv r">'+fmtD(off.reduce(function(s,t){return s+t.amount},0))+'</span></div>'+
+    off.map(function(t){return'<div class="row"><span class="rl" style="font-size:12px">'+t.merchant+'</span><span class="rv">'+fmtD(t.amount)+'</span></div>'}).join('')
 }
 
-// ── GOALS / DEBTS ────────────────────────────────────────────────
 async function addGoal(){
-  const name=document.getElementById('ng-name').value.trim()
-  const cur=parseFloat(document.getElementById('ng-current').value)||0
-  const tgt=parseFloat(document.getElementById('ng-target').value)||0
-  const type=document.getElementById('ng-type').value
+  var name=document.getElementById('ng-name').value.trim();
+  var cur=parseFloat(document.getElementById('ng-current').value)||0;
+  var tgt=parseFloat(document.getElementById('ng-target').value)||0;
+  var type=document.getElementById('ng-type').value;
   if(!name||tgt<=0){showToast('Fill in name and target',true);return}
-  const goal={id:uid(),name,current:cur,target:tgt,type,color:COLORS[goals.length%COLORS.length],log:[]}
+  var goal={id:uid(),name:name,current:cur,target:tgt,type:type,color:COLORS[goals.length%COLORS.length],log:[]};
   try{
-    await api('/goals','POST',goal)
-    goals.push(goal)
-    document.getElementById('ng-name').value=''
-    document.getElementById('ng-current').value=''
-    document.getElementById('ng-target').value=''
-    document.getElementById('add-goal-form').style.display='none'
-    showToast('Goal added')
-    renderAll()
+    await api('/goals','POST',goal);
+    goals.push(goal);
+    document.getElementById('ng-name').value='';
+    document.getElementById('ng-current').value='';
+    document.getElementById('ng-target').value='';
+    document.getElementById('add-goal-form').style.display='none';
+    showToast('Goal added');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
-
 async function deleteGoal(id){
-  try{await api('/goals/'+id,'DELETE');goals=goals.filter(g=>g.id!==id);showToast('Goal removed');renderAll()}
+  try{await api('/goals/'+id,'DELETE');goals=goals.filter(function(g){return g.id!==id});showToast('Goal removed');renderAll()}
   catch(e){showToast('Could not delete',true)}
 }
-
 async function updateGoalField(id,field,val){
-  const g=goals.find(g=>g.id===id);if(!g)return
-  const v=parseFloat(val);if(isNaN(v)||v<0)return
-  g[field]=v
+  var g=goals.find(function(g){return g.id===id});if(!g)return;
+  var v=parseFloat(val);if(isNaN(v)||v<0)return;
+  g[field]=v;
   try{await api('/goals/'+id,'PUT',{name:g.name,current:g.current,target:g.target});renderDash()}
   catch(e){showToast('Could not save',true)}
 }
-
 async function adjustGoal(id,sign){
-  const amtEl=document.getElementById('gadj-'+id),noteEl=document.getElementById('gnote-'+id)
-  const amt=parseFloat(amtEl.value)
+  var amtEl=document.getElementById('gadj-'+id),noteEl=document.getElementById('gnote-'+id);
+  var amt=parseFloat(amtEl.value);
   if(isNaN(amt)||amt<=0){showToast('Enter an amount',true);return}
-  const note=noteEl.value.trim()||(sign>0?'Contribution':'Payment / withdrawal')
-  const entry={id:uid(),goal_id:id,delta:sign*amt,note,logged_by:USER,date:today()}
+  var note=noteEl.value.trim()||(sign>0?'Contribution':'Payment / withdrawal');
+  var entry={id:uid(),goal_id:id,delta:sign*amt,note:note,logged_by:USER_NAME,date:today()};
   try{
-    await api('/goal-log','POST',entry)
-    const g=goals.find(g=>g.id===id);if(g){g.current=Math.max(0,g.current+(sign*amt));g.log=g.log||[];g.log.unshift({...entry,amount:sign*amt})}
-    amtEl.value='';noteEl.value=''
-    showToast(sign>0?'Added to goal':'Removed from goal')
-    renderAll()
+    await api('/goal-log','POST',entry);
+    var g=goals.find(function(g){return g.id===id});
+    if(g){g.current=Math.max(0,g.current+(sign*amt));g.log=g.log||[];g.log.unshift(Object.assign({},entry,{amount:sign*amt}))}
+    amtEl.value='';noteEl.value='';
+    showToast(sign>0?'Added':'Removed');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
-
 function renderGoals(){
-  const el=document.getElementById('goals-list')
+  var el=document.getElementById('goals-list');
   if(!goals.length){el.innerHTML='<div class="empty">No goals or debts yet. Add one above.</div>';return}
-  el.innerHTML=goals.map(g=>{
-    const pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100))
-    const remaining=g.type==='debt'?Math.max(0,g.current):Math.max(0,g.target-g.current)
-    const recentLog=(g.log||[]).slice(0,3)
-    return`<div class="card" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:15px;font-weight:600">${g.name}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:#6B6D69">${g.type==='debt'?'Debt':'Savings'}</span>
-          <button onclick="deleteGoal('${g.id}')" class="btn-sm" style="color:#6B6D69;font-size:11px">Remove</button>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
-        <div>
-          <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">${g.type==='debt'?'Current balance':'Current saved'}</div>
-          <div style="display:flex;align-items:center;gap:4px">
-            <span style="color:#6B6D69;font-size:13px">$</span>
-            <input class="inp-sm" type="number" value="${g.current}" onchange="updateGoalField('${g.id}','current',this.value)" style="width:100%;font-size:18px;font-weight:600;color:${g.color};background:transparent">
-          </div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">${g.type==='debt'?'Original balance':'Target'}</div>
-          <div style="display:flex;align-items:center;gap:4px">
-            <span style="color:#6B6D69;font-size:13px">$</span>
-            <input class="inp-sm" type="number" value="${g.target}" onchange="updateGoalField('${g.id}','target',this.value)" style="width:100%;font-size:18px;font-weight:600;color:#9A9C99;background:transparent">
-          </div>
-        </div>
-      </div>
-
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${g.color}"></div></div>
-      <div style="display:flex;gap:16px;font-size:12px;color:#9A9C99;margin-bottom:12px">
-        <span>${pct}% ${g.type==='debt'?'paid off':'funded'}</span>
-        <span>${fmt(remaining)} ${g.type==='debt'?'remaining':'to go'}</span>
-        ${remaining===0?'<span style="color:#1D9E75">Goal reached!</span>':''}
-      </div>
-
-      <div style="display:grid;grid-template-columns:90px 1fr 70px 70px;gap:8px;align-items:center;margin-bottom:${recentLog.length?'10px':'0'}">
-        <input class="inp-sm" id="gadj-${g.id}" type="number" placeholder="Amount" style="font-size:13px;padding:6px 8px">
-        <input class="inp-sm" id="gnote-${g.id}" placeholder="${g.type==='debt'?'Extra principal payment':'RSU deposit, bonus...'}" style="font-size:12px;padding:6px 8px">
-        <button onclick="adjustGoal('${g.id}',1)" class="btn-sm btn-plus">+ Add</button>
-        <button onclick="adjustGoal('${g.id}',-1)" class="btn-sm btn-minus">− Remove</button>
-      </div>
-
-      ${recentLog.length?`<div style="border-top:0.5px solid #1E221F;padding-top:8px">
-        <div style="font-size:11px;color:#6B6D69;margin-bottom:4px">Recent activity</div>
-        ${recentLog.map(l=>`<div class="log-entry">
-          <span style="font-size:12px">${l.note} <span style="color:#6B6D69">· ${l.logged_by} · ${l.date}</span></span>
-          <span class="${l.amount>0?'dp':'dn'}">${l.amount>0?'+':''}${fmt(l.amount)}</span>
-        </div>`).join('')}
-      </div>`:''}
-    </div>`
-  }).join('')
+  el.innerHTML=goals.map(function(g){
+    var pct=Math.min(100,Math.round(g.type==='debt'?(g.target-Math.max(0,g.current))/g.target*100:g.current/g.target*100));
+    var remaining=g.type==='debt'?Math.max(0,g.current):Math.max(0,g.target-g.current);
+    var recentLog=(g.log||[]).slice(0,3);
+    return'<div class="card" style="margin-bottom:12px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+        '<div style="font-size:15px;font-weight:600">'+g.name+'</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:11px;color:#6B6D69">'+(g.type==='debt'?'Debt':'Savings')+'</span>'+
+          '<button onclick="deleteGoal(\''+g.id+'\')" class="btn-sm" style="color:#6B6D69;font-size:11px">Remove</button>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">'+
+        '<div>'+
+          '<div style="font-size:11px;color:#6B6D69;margin-bottom:4px">'+(g.type==='debt'?'Current balance':'Current saved')+'</div>'+
+          '<div style="display:flex;align-items:center;gap:4px">'+
+            '<span style="color:#6B6D69;font-size:13px">$</span>'+
+            '<input class="inp-sm" type="number" value="'+g.current+'" onchange="updateGoalField(\''+g.id+'\',\'current\',this.value)" style="width:100%;font-size:18px;font-weight:600;color:'+g.color+';background:transparent">'+
+          '</div>'+
+        '</div>'+
+        '<div>'+
+          '<div style="font-size:11px;color:#6B6D69;margin-bottom:4px">'+(g.type==='debt'?'Original balance':'Target')+'</div>'+
+          '<div style="display:flex;align-items:center;gap:4px">'+
+            '<span style="color:#6B6D69;font-size:13px">$</span>'+
+            '<input class="inp-sm" type="number" value="'+g.target+'" onchange="updateGoalField(\''+g.id+'\',\'target\',this.value)" style="width:100%;font-size:18px;font-weight:600;color:#9A9C99;background:transparent">'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="prog-track"><div class="prog-fill" style="width:'+pct+'%;background:'+g.color+'"></div></div>'+
+      '<div style="display:flex;gap:16px;font-size:12px;color:#9A9C99;margin-bottom:12px">'+
+        '<span>'+pct+'% '+(g.type==='debt'?'paid off':'funded')+'</span>'+
+        '<span>'+fmt(remaining)+' '+(g.type==='debt'?'remaining':'to go')+'</span>'+
+        (remaining===0?'<span style="color:#1D9E75">Goal reached!</span>':'')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:90px 1fr 70px 70px;gap:8px;align-items:center;margin-bottom:'+(recentLog.length?'10px':'0')+'">'+
+        '<input class="inp-sm" id="gadj-'+g.id+'" type="number" placeholder="Amount" style="font-size:13px;padding:6px 8px">'+
+        '<input class="inp-sm" id="gnote-'+g.id+'" placeholder="'+(g.type==='debt'?'Extra principal payment':'RSU deposit, bonus...')+'" style="font-size:12px;padding:6px 8px">'+
+        '<button onclick="adjustGoal(\''+g.id+'\',1)" class="btn-sm btn-plus">+ Add</button>'+
+        '<button onclick="adjustGoal(\''+g.id+'\',-1)" class="btn-sm btn-minus">- Remove</button>'+
+      '</div>'+
+      (recentLog.length?'<div style="border-top:0.5px solid #1E221F;padding-top:8px">'+
+        '<div style="font-size:11px;color:#6B6D69;margin-bottom:4px">Recent activity</div>'+
+        recentLog.map(function(l){return'<div class="log-entry">'+
+          '<span style="font-size:12px">'+l.note+' <span style="color:#6B6D69">- '+l.logged_by+' - '+l.date+'</span></span>'+
+          '<span class="'+(l.amount>0?'dp':'dn')+'">'+(l.amount>0?'+':'')+fmt(l.amount)+'</span>'+
+        '</div>'}).join('')+
+      '</div>':'')+
+    '</div>'}).join('')
 }
 
-// ── AUTO LOGIN if session saved ───────────────────────────────────
-const savedUser=sessionStorage.getItem('sentiom_user')
-if(savedUser){
-  USER=savedUser
-  document.getElementById('login-screen').style.display='none'
-  document.getElementById('main-app').style.display='flex'
-  document.getElementById('pill-you').textContent=USER
-  document.getElementById('tx-date').value=today()
-  document.getElementById('inc-date').value=today()
-  updateMonthLabel()
-  loadAll()
+var savedToken=getCookie('sentiom_token');
+var savedName=getCookie('sentiom_name');
+var savedUid=getCookie('sentiom_uid');
+if(savedToken&&savedName){
+  SESSION_TOKEN=savedToken;USER_NAME=savedName;USER_ID=savedUid;
+  startApp()
 }
 </script>
 </body>
