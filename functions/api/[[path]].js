@@ -158,6 +158,30 @@ export async function onRequest(context) {
     }
   }
 
+  // ── DELETE ACCOUNT ───────────────────────────────────────────────
+  if (path === '/delete-account' && method === 'DELETE') {
+    const authHeader2 = request.headers.get('Authorization') || ''
+    const token2 = authHeader2.replace('Bearer ', '').trim()
+    if (!token2) return new Response(JSON.stringify({ error: 'No session' }), { status: 401, headers })
+    const session2 = await db.prepare('SELECT user_id FROM sessions WHERE token = ?').bind(token2).first()
+    if (!session2) return new Response(JSON.stringify({ error: 'Invalid session' }), { status: 401, headers })
+    const uid2 = session2.user_id
+    try {
+      await db.prepare('DELETE FROM transactions WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM income_log WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM bills WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM bill_actuals WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM goals WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM goal_log WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM free_budgets WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(uid2).run()
+      await db.prepare('DELETE FROM users WHERE id = ?').bind(uid2).run()
+      return new Response(JSON.stringify({ ok: true }), { headers })
+    } catch(err) {
+      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers })
+    }
+  }
+
   // ── SESSION CHECK ─────────────────────────────────────────────
   const authHeader = request.headers.get('Authorization') || ''
   const token = authHeader.replace('Bearer ', '').trim()

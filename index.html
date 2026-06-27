@@ -126,7 +126,13 @@ input::placeholder{color:#6B6D69}
       <span id="month-label"></span>
       <button onclick="nextMonth()">&#8250;</button>
     </div>
-    <div class="user-info" id="user-display" onclick="doLogout()">Sign out</div>
+    <div style="position:relative">
+    <div class="user-info" id="user-display" onclick="toggleUserMenu()" style="cursor:pointer"></div>
+    <div id="user-menu" style="display:none;position:absolute;right:0;top:32px;background:#161A17;border:0.5px solid #2A2D2B;border-radius:10px;min-width:160px;z-index:100;overflow:hidden">
+      <div onclick="doLogout()" style="padding:12px 16px;font-size:13px;color:#9A9C99;cursor:pointer;border-bottom:0.5px solid #1E221F" onmouseover="this.style.background='#1E221F'" onmouseout="this.style.background='transparent'">Sign out</div>
+      <div onclick="doDeleteAccount()" style="padding:12px 16px;font-size:13px;color:#E24B4A;cursor:pointer" onmouseover="this.style.background='#1E221F'" onmouseout="this.style.background='transparent'">Delete account</div>
+    </div>
+  </div>
   </div>
   <div class="nav">
     <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
@@ -379,6 +385,29 @@ async function doResetPassword(){
     setTimeout(function(){window.location.href='/'},2000)
   }catch(e){err.textContent=e.message||'Something went wrong'}
 }
+function toggleUserMenu(){
+  var m=document.getElementById('user-menu');
+  m.style.display=m.style.display==='none'?'block':'none'
+}
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('user-menu');
+  var display=document.getElementById('user-display');
+  if(menu&&display&&!display.contains(e.target)&&!menu.contains(e.target)){
+    menu.style.display='none'
+  }
+})
+async function doDeleteAccount(){
+  if(!confirm('Are you sure? This will permanently delete your account and all your data.'))return
+  if(!confirm('This cannot be undone. Delete everything?'))return
+  try{
+    await api('/delete-account','DELETE')
+    deleteCookie('sentiom_token');deleteCookie('sentiom_name');deleteCookie('sentiom_uid');
+    SESSION_TOKEN='';USER_NAME='';USER_ID='';
+    document.getElementById('main-app').style.display='none';
+    document.getElementById('auth-screen').style.display='flex';
+    showLogin()
+  }catch(e){showToast('Could not delete account',true)}
+}
 function showSignup(){
   document.getElementById('login-form').style.display='none';
   document.getElementById('signup-form').style.display='flex';
@@ -436,7 +465,7 @@ function doLogout(){
 function startApp(){
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('main-app').style.display='flex';
-  document.getElementById('user-display').textContent=USER_NAME+' - Sign out';
+  document.getElementById('user-display').textContent=USER_NAME;
   document.getElementById('tx-date').value=today();
   document.getElementById('inc-date').value=today();
   updateMonthLabel();loadAll()
