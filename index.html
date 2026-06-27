@@ -495,7 +495,8 @@ function renderDash(){
     '<div class="metric"><div class="mlabel">Income logged</div><div class="mval g">'+fmt(totalInc)+'</div></div>'+
     '<div class="metric"><div class="mlabel">Bills paid</div><div class="mval a">'+fmt(billsPaid)+'</div></div>'+
     '<div class="metric"><div class="mlabel">Off-budget spend</div><div class="mval r">'+fmt(offAmt)+'</div></div>'+
-    '<div class="metric"><div class="mlabel">All transactions</div><div class="mval">'+fmt(allTx)+'</div></div>';
+    '<div class="metric"><div class="mlabel">All transactions</div><div class="mval">'+fmt(allTx)+'</div></div>'+
+    '<div class="metric" style="background:#1A1400;border:0.5px solid #EF9F27"><div class="mlabel" style="color:#EF9F27">Free spend left</div><div class="mval gold">'+fmt(Math.max(0,(function(){var fb=bills.find(function(b){return b.name==="Free Cash"});return fb?fb.est:0})()-freeAmt))+'</div></div>';
 
   var di=document.getElementById('dash-income');
   if(!incomeLog.length){di.innerHTML='<div class="empty">No income logged yet.</div>'}
