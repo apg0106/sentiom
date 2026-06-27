@@ -165,7 +165,7 @@ input::placeholder{color:#6B6D69}
           <div><label class="form-label">Source</label><input id="inc-source" placeholder="e.g. Paycheck, RSU vest"></div>
           <div><label class="form-label">Amount</label><input id="inc-amount" type="number" placeholder="0.00"></div>
           <div><label class="form-label">Type</label>
-            <select id="inc-type"><option>Paycheck</option><option>VA Disability</option><option>RSU Vest</option><option>Bonus</option><option>Previous Balance</option><option>Other</option></select>
+            <select id="inc-type"><option>Paycheck</option><option>Bonus</option><option>Other</option><option>Previous Balance</option></select>
           </div>
           <div><label class="form-label">Date</label><input id="inc-date" type="date"></div>
         </div>
@@ -627,6 +627,18 @@ async function deleteBill(id){
   try{await api('/bills/'+id,'DELETE');bills=bills.filter(function(b){return b.id!==id});renderAll();showToast('Bill removed')}
   catch(e){showToast('Could not delete',true)}
 }
+async function updateBillName(id,val){
+  var b=bills.find(function(b){return b.id===id});if(!b||!val.trim())return;
+  b.name=val.trim();
+  try{await api('/bills/'+id,'PUT',{name:b.name,est:b.est,cat:b.cat});renderDash()}
+  catch(e){showToast('Could not save',true)}
+}
+async function updateBillCat(id,val){
+  var b=bills.find(function(b){return b.id===id});if(!b)return;
+  b.cat=val;
+  try{await api('/bills/'+id,'PUT',{name:b.name,est:b.est,cat:b.cat});renderDash()}
+  catch(e){showToast('Could not save',true)}
+}
 async function updateBillEst(id,val){
   var v=parseFloat(val);var b=bills.find(function(b){return b.id===id});if(!b||isNaN(v))return;
   b.est=v;
@@ -642,11 +654,24 @@ async function updateBillActual(id,val){
 }
 function renderBills(){
   var sorted=[].concat(bills).sort(function(a,b){return a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name)});
-  document.getElementById('bills-list').innerHTML=sorted.map(function(b){return'<div class="bill-grid">'+
-    '<span class="rl" style="font-size:12px">'+b.name+'</span>'+
-    '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
-    '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" oninput="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
-    '<button onclick="deleteBill(\''+b.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0">x</button>'+
+  document.getElementById('bills-list').innerHTML=sorted.map(function(b){return'<div style="padding:6px 0;border-bottom:0.5px solid #1A1D1B">'+
+    '<div style="display:grid;grid-template-columns:1fr 80px 30px;gap:6px;align-items:center;margin-bottom:4px">'+
+      '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;font-weight:500;color:#E8E8E6">'+
+      '<select class="inp-sm" onchange="updateBillCat(\''+b.id+'\',this.value)" style="font-size:11px;padding:3px 4px">'+
+        '<option value="Housing" '+(b.cat==='Housing'?'selected':'')+'>Housing</option>'+
+        '<option value="Utilities" '+(b.cat==='Utilities'?'selected':'')+'>Utilities</option>'+
+        '<option value="Transport" '+(b.cat==='Transport'?'selected':'')+'>Transport</option>'+
+        '<option value="Food" '+(b.cat==='Food'?'selected':'')+'>Food</option>'+
+        '<option value="Subscriptions" '+(b.cat==='Subscriptions'?'selected':'')+'>Subscriptions</option>'+
+        '<option value="Other" '+(b.cat==='Other'?'selected':'')+'>Other</option>'+
+      '</select>'+
+      '<button onclick="deleteBill(\''+b.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0">x</button>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 55px 65px;gap:6px;align-items:center">'+
+      '<span style="font-size:11px;color:#6B6D69">Est. / Actual</span>'+
+      '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
+      '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" oninput="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
+    '</div>'+
   '</div>'}).join('');
   document.getElementById('bills-est-total').textContent=fmt(bills.reduce(function(s,b){return s+b.est},0));
   document.getElementById('bills-act-total').textContent=fmt(bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est)},0))
@@ -677,8 +702,21 @@ async function addTx(){
   }catch(e){showToast('Could not save',true)}
 }
 async function deleteTx(id){
-  try{await api('/transactions/'+id,'DELETE');transactions=transactions.filter(function(t){return t.id!==id});renderAll()}
-  catch(e){showToast('Could not delete',true)}
+  try{
+    var tx=transactions.find(function(t){return t.id===id});
+    await api('/transactions/'+id,'DELETE');
+    transactions=transactions.filter(function(t){return t.id!==id});
+    if(tx&&(tx.type==='gas'||tx.type==='groceries'||tx.type==='free-spend')){
+      var billName=tx.type==='gas'?'Gas (est)':tx.type==='groceries'?'Groceries (est)':'Free Cash';
+      var bill=bills.find(function(b){return b.name===billName});
+      if(bill){
+        var newActual=Math.max(0,parseFloat(((billActuals[bill.id]||0)-tx.amount).toFixed(2)));
+        billActuals[bill.id]=newActual;
+        await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
+      }
+    }
+    renderAll()
+  }catch(e){showToast('Could not delete',true)}
 }
 function renderTx(){
   var el=document.getElementById('tx-list');
