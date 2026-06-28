@@ -78,7 +78,7 @@ input::placeholder{color:#6B6D69}
 .instr-title{font-size:15px;font-weight:600;color:#1D9E75;margin-bottom:8px}
 .instr-body{font-size:13px;color:#9A9C99;line-height:1.7}
 .instr-body b{color:#E8E8E6}
-.bill-grid{display:grid;grid-template-columns:1fr 55px 65px 30px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center}
+.bill-grid{display:grid;grid-template-columns:20px 1fr 55px 65px 30px;gap:6px;font-size:13px;padding:5px 0;border-bottom:0.5px solid #1A1D1B;align-items:center}
 </style>
 </head>
 <body>
@@ -623,6 +623,81 @@ async function deleteBill(id){
   try{await api('/bills/'+id,'DELETE');bills=bills.filter(function(b){return b.id!==id});renderAll();showToast('Bill removed')}
   catch(e){showToast('Could not delete',true)}
 }
+// ── DRAG AND DROP BILL REORDER ───────────────────────────────
+var dragSrcId=null,touchSrcId=null,touchStartY=0;
+
+function dragStart(e){
+  dragSrcId=e.currentTarget.dataset.id;
+  e.currentTarget.style.opacity='0.4';
+  e.dataTransfer.effectAllowed='move';
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  return false;
+}
+async function dropBill(e){
+  e.preventDefault();
+  var targetId=e.currentTarget.dataset.id;
+  if(!dragSrcId||dragSrcId===targetId)return;
+  // Find positions in bills array
+  var srcIdx=bills.findIndex(function(b){return b.id===dragSrcId});
+  var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
+  // Swap in local array
+  var tmp=bills[srcIdx];bills[srcIdx]=bills[tgtIdx];bills[tgtIdx]=tmp;
+  // Reset opacity
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
+  dragSrcId=null;
+  // Save new order to DB
+  await saveBillOrder();
+  renderBills();
+}
+async function saveBillOrder(){
+  for(var i=0;i<bills.length;i++){
+    bills[i].sort_order=i+1;
+    try{await api('/bills/'+bills[i].id,'PUT',{name:bills[i].name,est:bills[i].est,cat:bills[i].cat,sort_order:i+1})}catch(e){}
+  }
+}
+
+// Touch support for mobile
+var touchClone=null;
+function touchStart(e){
+  touchSrcId=e.currentTarget.dataset.id;
+  touchStartY=e.touches[0].clientY;
+  e.currentTarget.style.opacity='0.4';
+}
+function touchMove(e){
+  e.preventDefault();
+  if(!touchClone){
+    var src=e.currentTarget;
+    touchClone=src.cloneNode(true);
+    touchClone.style.position='fixed';
+    touchClone.style.zIndex='1000';
+    touchClone.style.opacity='0.8';
+    touchClone.style.pointerEvents='none';
+    touchClone.style.width=src.offsetWidth+'px';
+    document.body.appendChild(touchClone);
+  }
+  touchClone.style.top=(e.touches[0].clientY-30)+'px';
+  touchClone.style.left=e.currentTarget.getBoundingClientRect().left+'px';
+}
+async function touchEnd(e){
+  if(touchClone){document.body.removeChild(touchClone);touchClone=null;}
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
+  var y=e.changedTouches[0].clientY;
+  var target=document.elementFromPoint(e.changedTouches[0].clientX,y);
+  var targetRow=target?target.closest('.bill-grid'):null;
+  var targetId=targetRow?targetRow.dataset.id:null;
+  if(targetId&&targetId!==touchSrcId){
+    var srcIdx=bills.findIndex(function(b){return b.id===touchSrcId});
+    var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
+    var tmp=bills[srcIdx];bills[srcIdx]=bills[tgtIdx];bills[tgtIdx]=tmp;
+    await saveBillOrder();
+    renderBills();
+  }
+  touchSrcId=null;
+}
+
 async function updateBillName(id,val){
   var b=bills.find(function(b){return b.id===id});if(!b||!val.trim())return;
   b.name=val.trim();
@@ -681,7 +756,8 @@ async function updateBillActual(id,val){
 }
 function renderBills(){
   var sorted=[].concat(bills).sort(function(a,b){return a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name)});
-  document.getElementById('bills-list').innerHTML=sorted.map(function(b){return'<div class="bill-grid">'+
+  document.getElementById('bills-list').innerHTML=sorted.map(function(b,idx){return'<div class="bill-grid" draggable="true" data-id="'+b.id+'" data-idx="'+idx+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBill(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">'+
+    '<span style="color:#3A3D3B;cursor:grab;font-size:14px;text-align:center">&#8942;</span>'+
     '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;color:#E8E8E6">'+
     '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
     '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" onchange="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right;color:'+(billActuals[b.id]!==undefined&&billActuals[b.id]>b.est?'#E24B4A':'#E8E8E6')+'">'+

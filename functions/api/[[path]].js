@@ -238,7 +238,11 @@ export async function onRequest(context) {
     if (path.startsWith('/bills/') && method === 'PUT') {
       const id = path.split('/')[2]
       const body = await request.json()
-      await db.prepare('UPDATE bills SET name = ?, est = ?, cat = ? WHERE id = ? AND user_id = ?').bind(body.name, body.est, body.cat, id, uid).run()
+      if (body.sort_order !== undefined) {
+        await db.prepare('UPDATE bills SET name = ?, est = ?, cat = ?, sort_order = ? WHERE id = ? AND user_id = ?').bind(body.name, body.est, body.cat, body.sort_order, id, uid).run()
+      } else {
+        await db.prepare('UPDATE bills SET name = ?, est = ?, cat = ? WHERE id = ? AND user_id = ?').bind(body.name, body.est, body.cat, id, uid).run()
+      }
       return new Response(JSON.stringify({ ok: true }), { headers })
     }
     if (path.startsWith('/bills/') && method === 'DELETE') {
