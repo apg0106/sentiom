@@ -214,13 +214,9 @@ input::placeholder{color:#6B6D69}
           <div><label class="form-label">Merchant</label><input id="tx-merchant" placeholder="e.g. Pizza Hut, Amazon"></div>
           <div><label class="form-label">Amount</label><input id="tx-amount" type="number" step="0.01" placeholder="0.00"></div>
           <div><label class="form-label">Date</label><input id="tx-date" type="date"></div>
-          <div><label class="form-label">Type</label>
+          <div><label class="form-label">Category</label>
             <select id="tx-type">
-              <option value="budgeted">Budgeted</option>
               <option value="off-budget">Off-budget</option>
-              <option value="discretionary">Discretionary</option>
-              <option value="gas">Gas</option>
-              <option value="groceries">Groceries</option>
             </select>
           </div>
         </div>
@@ -500,7 +496,7 @@ function showTab(id,btn){
   btn.classList.add('active');renderAll()
 }
 function toggleForm(id){var f=document.getElementById(id);f.style.display=f.style.display==='none'?'':'none'}
-function renderAll(){renderDash();renderIncome();renderBills();renderTx();renderGoals()}
+function renderAll(){renderDash();renderIncome();renderBills();renderTx();renderGoals();populateTxDropdown()}
 
 function renderDash(){
   var totalInc=incomeLog.reduce(function(s,i){return s+i.amount},0);
@@ -648,6 +644,12 @@ async function updateBillEst(id,val){
 async function updateBillActual(id,val){
   var v=parseFloat(val);
   if(isNaN(v)||v<0){delete billActuals[id];renderDash();return}
+  // Check for existing transaction for this bill this month
+  var existing=transactions.filter(function(t){return t.bill_id===id});
+  if(existing.length>0){
+    var total=existing.reduce(function(s,t){return s+t.amount},0);
+    if(!confirm('You already have '+existing.length+' transaction(s) totaling '+fmt(total)+' logged for this bill. Add a separate actual anyway?'))return;
+  }
   billActuals[id]=v;
   try{await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:v});renderDash()}
   catch(e){showToast('Could not save',true)}
@@ -670,18 +672,17 @@ async function addTx(){
   var d=document.getElementById('tx-date').value;
   var t=document.getElementById('tx-type').value;
   if(!m||isNaN(a)||a<=0||!d){showToast('Fill in all fields',true);return}
-  var tx={id:uid(),merchant:m,amount:a,date:d,type:t,logged_by:USER_NAME,month_key:mKey()};
+  // Check if this is a bill category
+  var bill=t==='off-budget'?null:bills.find(function(b){return b.id===t});
+  var tx={id:uid(),merchant:m,amount:a,date:d,type:t,bill_id:bill?bill.id:null,logged_by:USER_NAME,month_key:mKey()};
   try{
     await api('/transactions','POST',tx);
     transactions.unshift(tx);
-    if(t==='gas'||t==='groceries'||t==='discretionary'){
-      var billName=t==='gas'?'Gas (est)':t==='groceries'?'Groceries (est)':'Monthly Discretionary';
-      var bill=bills.find(function(b){return b.name===billName});
-      if(bill){
-        var newActual=parseFloat(((billActuals[bill.id]||0)+a).toFixed(2));
-        billActuals[bill.id]=newActual;
-        await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
-      }
+    // Auto-update bill actual if bill category selected
+    if(bill){
+      var newActual=parseFloat(((billActuals[bill.id]||0)+a).toFixed(2));
+      billActuals[bill.id]=newActual;
+      await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
     }
     document.getElementById('tx-merchant').value='';
     document.getElementById('tx-amount').value='';
@@ -693,9 +694,8 @@ async function deleteTx(id){
     var tx=transactions.find(function(t){return t.id===id});
     await api('/transactions/'+id,'DELETE');
     transactions=transactions.filter(function(t){return t.id!==id});
-    if(tx&&(tx.type==='gas'||tx.type==='groceries'||tx.type==='discretionary')){
-      var billName=tx.type==='gas'?'Gas (est)':tx.type==='groceries'?'Groceries (est)':'Monthly Discretionary';
-      var bill=bills.find(function(b){return b.name===billName});
+    if(tx&&tx.bill_id){
+      var bill=bills.find(function(b){return b.id===tx.bill_id});
       if(bill){
         var newActual=Math.max(0,parseFloat(((billActuals[bill.id]||0)-tx.amount).toFixed(2)));
         billActuals[bill.id]=newActual;
@@ -705,13 +705,28 @@ async function deleteTx(id){
     renderAll()
   }catch(e){showToast('Could not delete',true)}
 }
+function populateTxDropdown(){
+  var select=document.getElementById('tx-type');
+  if(!select)return;
+  var current=select.value;
+  select.innerHTML='<option value="off-budget">Off-budget</option>';
+  var sorted=[].concat(bills).sort(function(a,b){return a.name.localeCompare(b.name)});
+  sorted.forEach(function(b){
+    var opt=document.createElement('option');
+    opt.value=b.id;
+    opt.textContent=b.name;
+    select.appendChild(opt);
+  });
+  if(current)select.value=current;
+}
 function renderTx(){
   var el=document.getElementById('tx-list');
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
     transactions.map(function(t){
-      var badgeClass=t.type==='budgeted'?'badge-b':t.type==='off-budget'?'badge-o':t.type==='discretionary'?'badge-f':'badge-b';
-      var badgeStyle=t.type==='gas'||t.type==='groceries'?'background:#0A2A0A;color:#5DC85D':'';
-      var badgeText=t.type==='budgeted'?'Budgeted':t.type==='off-budget'?'Off-budget':t.type==='discretionary'?'Discretionary':t.type==='gas'?'Gas':'Groceries';
+      var badgeClass=t.type==='off-budget'?'badge-o':'badge-b';
+      var badgeStyle=t.type!=='off-budget'?'background:#0A2018;color:#1D9E75':'';
+      var bill=t.bill_id?bills.find(function(b){return b.id===t.bill_id}):null;
+      var badgeText=t.type==='off-budget'?'Off-budget':bill?bill.name:t.type;
       return'<div style="display:grid;grid-template-columns:1fr 65px 90px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
         '<span style="font-size:12px">'+t.merchant+'</span>'+
         '<span style="font-weight:500">'+fmtD(t.amount)+'</span>'+

@@ -202,7 +202,7 @@ export async function onRequest(context) {
     }
     if (path === '/transactions' && method === 'POST') {
       const body = await request.json()
-      await db.prepare('INSERT INTO transactions (id, merchant, amount, date, type, logged_by, month_key, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(body.id, body.merchant, body.amount, body.date, body.type, body.logged_by, body.month_key, uid).run()
+      await db.prepare('INSERT INTO transactions (id, merchant, amount, date, type, bill_id, logged_by, month_key, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(body.id, body.merchant, body.amount, body.date, body.type, body.bill_id||null, body.logged_by, body.month_key, uid).run()
       return new Response(JSON.stringify({ ok: true }), { headers })
     }
     if (path.startsWith('/transactions/') && method === 'DELETE') {
