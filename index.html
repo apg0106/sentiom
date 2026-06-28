@@ -746,9 +746,9 @@ function renderTx(){
   el.innerHTML=!transactions.length?'<div class="empty">No transactions this month.</div>':
     transactions.map(function(t){
       var badgeClass=t.type==='off-budget'?'badge-o':'badge-b';
-      var badgeStyle=t.type!=='off-budget'?'background:#0A2018;color:#1D9E75':'';
       var bill=t.bill_id?bills.find(function(b){return b.id===t.bill_id}):null;
-      var badgeText=t.type==='off-budget'?'Off-budget':bill?bill.name:t.type;
+      var badgeStyle=t.type==='off-budget'?'':'background:#0A2018;color:#1D9E75';
+      var badgeText=t.type==='off-budget'?'Off-budget':bill?bill.name:t.type==='discretionary'?'Discretionary':t.type;
       return'<div style="display:grid;grid-template-columns:1fr 65px 90px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
         '<span style="font-size:12px">'+t.merchant+'</span>'+
         '<span style="font-weight:500">'+fmtD(t.amount)+'</span>'+
