@@ -691,17 +691,19 @@ async function addTx(){
   if(!m||isNaN(a)||a<=0||!d){showToast('Fill in all fields',true);return}
   // Check if this is a bill category
   var bill=t==='off-budget'?null:bills.find(function(b){return b.id===t});
+  // Check for duplicates BEFORE saving
+  if(bill){
+    var existingTx=transactions.filter(function(t){return t.bill_id===bill.id});
+    if(existingTx.length>0){
+      var total=existingTx.reduce(function(s,t){return s+t.amount},0);
+      if(!confirm('You already have '+existingTx.length+' transaction(s) totaling '+fmt(total)+' for '+bill.name+'. Log another?'))return;
+    }
+  }
   var tx={id:uid(),merchant:m,amount:a,date:d,type:t,bill_id:bill?bill.id:null,logged_by:USER_NAME,month_key:mKey()};
   try{
     await api('/transactions','POST',tx);
     transactions.unshift(tx);
-    // Auto-update bill actual if bill category selected
     if(bill){
-      var existingTx=transactions.filter(function(t){return t.bill_id===bill.id});
-      if(existingTx.length>0){
-        var total=existingTx.reduce(function(s,t){return s+t.amount},0);
-        if(!confirm('You already have '+existingTx.length+' transaction(s) totaling '+fmt(total)+' for '+bill.name+'. Log another?'))return;
-      }
       var newActual=parseFloat(((billActuals[bill.id]||0)+a).toFixed(2));
       billActuals[bill.id]=newActual;
       await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
