@@ -643,7 +643,11 @@ async function updateBillEst(id,val){
 }
 async function updateBillActual(id,val){
   var v=parseFloat(val);
-  if(isNaN(v)||v<0){delete billActuals[id];renderDash();return}
+  if(isNaN(v)||v<0){
+    delete billActuals[id];
+    try{await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:0})}catch(e){}
+    renderDash();return
+  }
   // Check for existing transaction for this bill this month
   var existing=transactions.filter(function(t){return t.bill_id===id});
   if(existing.length>0){
