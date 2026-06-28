@@ -669,40 +669,58 @@ async function saveBillOrder(){
 }
 
 // Touch support for mobile
-var touchClone=null;
+var touchClone=null,touchScrollTop=0;
 function touchStart(e){
   touchSrcId=e.currentTarget.dataset.id;
   touchStartY=e.touches[0].clientY;
-  e.currentTarget.style.opacity='0.4';
+  touchScrollTop=document.querySelector('.body').scrollTop;
+  var src=e.currentTarget;
+  src.style.opacity='0.4';
+  touchClone=src.cloneNode(true);
+  touchClone.style.position='fixed';
+  touchClone.style.zIndex='1000';
+  touchClone.style.opacity='0.85';
+  touchClone.style.pointerEvents='none';
+  touchClone.style.width=src.offsetWidth+'px';
+  touchClone.style.background='#1E221F';
+  touchClone.style.borderRadius='8px';
+  touchClone.style.left=src.getBoundingClientRect().left+'px';
+  touchClone.style.top=src.getBoundingClientRect().top+'px';
+  document.body.appendChild(touchClone);
 }
 function touchMove(e){
   e.preventDefault();
-  if(!touchClone){
-    var src=e.currentTarget;
-    touchClone=src.cloneNode(true);
-    touchClone.style.position='fixed';
-    touchClone.style.zIndex='1000';
-    touchClone.style.opacity='0.8';
-    touchClone.style.pointerEvents='none';
-    touchClone.style.width=src.offsetWidth+'px';
-    document.body.appendChild(touchClone);
+  if(!touchClone)return;
+  var y=e.touches[0].clientY;
+  touchClone.style.top=(y-20)+'px';
+  // Highlight target row
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.borderTop='';});
+  var target=document.elementFromPoint(e.touches[0].clientX,y);
+  var targetRow=target?target.closest('.bill-grid'):null;
+  if(targetRow&&targetRow.dataset.id!==touchSrcId){
+    targetRow.style.borderTop='2px solid #1D9E75';
   }
-  touchClone.style.top=(e.touches[0].clientY-30)+'px';
-  touchClone.style.left=e.currentTarget.getBoundingClientRect().left+'px';
 }
 async function touchEnd(e){
   if(touchClone){document.body.removeChild(touchClone);touchClone=null;}
-  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
+  document.querySelectorAll('.bill-grid').forEach(function(el){
+    el.style.opacity='1';
+    el.style.borderTop='';
+  });
   var y=e.changedTouches[0].clientY;
-  var target=document.elementFromPoint(e.changedTouches[0].clientX,y);
+  var x=e.changedTouches[0].clientX;
+  var target=document.elementFromPoint(x,y);
   var targetRow=target?target.closest('.bill-grid'):null;
   var targetId=targetRow?targetRow.dataset.id:null;
   if(targetId&&targetId!==touchSrcId){
     var srcIdx=bills.findIndex(function(b){return b.id===touchSrcId});
     var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
-    var tmp=bills[srcIdx];bills[srcIdx]=bills[tgtIdx];bills[tgtIdx]=tmp;
-    await saveBillOrder();
-    renderBills();
+    if(srcIdx>-1&&tgtIdx>-1){
+      var moved=bills.splice(srcIdx,1)[0];
+      bills.splice(tgtIdx,0,moved);
+      await saveBillOrder();
+      renderBills();
+    }
   }
   touchSrcId=null;
 }
