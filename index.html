@@ -655,7 +655,20 @@ async function updateBillActual(id,val){
     if(!confirm('You already have '+existing.length+' transaction(s) totaling '+fmt(total)+' logged for this bill. Add a separate actual anyway?'))return;
   }
   billActuals[id]=v;
-  try{await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:v});renderDash()}
+  try{
+    await api('/bill-actuals','POST',{id:id+'-'+mKey(),bill_id:id,month_key:mKey(),actual:v});
+    // Create a transaction for this bill payment
+    var bill=bills.find(function(b){return b.id===id});
+    if(bill){
+      var existingTx=transactions.filter(function(t){return t.bill_id===id});
+      if(existingTx.length===0){
+        var tx={id:uid(),merchant:bill.name,amount:v,date:today(),type:id,bill_id:id,logged_by:USER_NAME,month_key:mKey()};
+        await api('/transactions','POST',tx);
+        transactions.unshift(tx);
+      }
+    }
+    renderDash()
+  }
   catch(e){showToast('Could not save',true)}
 }
 function renderBills(){
