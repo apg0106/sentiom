@@ -624,32 +624,40 @@ async function deleteBill(id){
   catch(e){showToast('Could not delete',true)}
 }
 // ── DRAG AND DROP BILL REORDER ───────────────────────────────
-var dragSrcId=null,touchSrcId=null,touchStartY=0;
+var dragSrcId=null,touchSrcId=null,touchStartY=0,dragOverId=null;
 
 function dragStart(e){
   dragSrcId=e.currentTarget.dataset.id;
-  e.currentTarget.style.opacity='0.4';
   e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',dragSrcId);
+  setTimeout(function(){e.currentTarget.style.opacity='0.4'},0);
 }
 function dragOver(e){
   e.preventDefault();
   e.dataTransfer.dropEffect='move';
+  var row=e.currentTarget;
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.borderTop=''});
+  row.style.borderTop='2px solid #1D9E75';
+  dragOverId=row.dataset.id;
   return false;
 }
+function dragLeave(e){
+  e.currentTarget.style.borderTop='';
+}
 async function dropBill(e){
-  e.stopPropagation();
   e.preventDefault();
-  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
-  var targetRow=e.currentTarget;
-  var targetId=targetRow.dataset.id;
-  if(!dragSrcId||dragSrcId===targetId){dragSrcId=null;return;}
+  document.querySelectorAll('.bill-grid').forEach(function(el){
+    el.style.opacity='1';
+    el.style.borderTop='';
+  });
+  var targetId=dragOverId||e.currentTarget.dataset.id;
+  if(!dragSrcId||dragSrcId===targetId){dragSrcId=null;dragOverId=null;return;}
   var srcIdx=bills.findIndex(function(b){return b.id===dragSrcId});
   var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
-  if(srcIdx===-1||tgtIdx===-1){dragSrcId=null;return;}
-  // Move bill from srcIdx to tgtIdx
+  if(srcIdx===-1||tgtIdx===-1){dragSrcId=null;dragOverId=null;return;}
   var moved=bills.splice(srcIdx,1)[0];
   bills.splice(tgtIdx,0,moved);
-  dragSrcId=null;
+  dragSrcId=null;dragOverId=null;
   await saveBillOrder();
   renderBills();
 }
@@ -757,7 +765,7 @@ async function updateBillActual(id,val){
 }
 function renderBills(){
   var sorted=[].concat(bills).sort(function(a,b){return a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name)});
-  document.getElementById('bills-list').innerHTML=sorted.map(function(b,idx){return'<div class="bill-grid" draggable="true" data-id="'+b.id+'" data-idx="'+idx+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBill(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">'+
+  document.getElementById('bills-list').innerHTML=sorted.map(function(b,idx){return'<div class="bill-grid" draggable="true" data-id="'+b.id+'" data-idx="'+idx+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropBill(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">'+
     '<span style="color:#3A3D3B;cursor:grab;font-size:14px;text-align:center">&#8942;</span>'+
     '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;color:#E8E8E6">'+
     '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
