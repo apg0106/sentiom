@@ -637,18 +637,19 @@ function dragOver(e){
   return false;
 }
 async function dropBill(e){
+  e.stopPropagation();
   e.preventDefault();
-  var targetId=e.currentTarget.dataset.id;
-  if(!dragSrcId||dragSrcId===targetId)return;
-  // Find positions in bills array
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
+  var targetRow=e.currentTarget;
+  var targetId=targetRow.dataset.id;
+  if(!dragSrcId||dragSrcId===targetId){dragSrcId=null;return;}
   var srcIdx=bills.findIndex(function(b){return b.id===dragSrcId});
   var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
-  // Swap in local array
-  var tmp=bills[srcIdx];bills[srcIdx]=bills[tgtIdx];bills[tgtIdx]=tmp;
-  // Reset opacity
-  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.opacity='1'});
+  if(srcIdx===-1||tgtIdx===-1){dragSrcId=null;return;}
+  // Move bill from srcIdx to tgtIdx
+  var moved=bills.splice(srcIdx,1)[0];
+  bills.splice(tgtIdx,0,moved);
   dragSrcId=null;
-  // Save new order to DB
   await saveBillOrder();
   renderBills();
 }
