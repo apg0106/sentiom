@@ -71,7 +71,7 @@ export async function onRequest(context) {
           </div>
           <div style="background:#101310;border:0.5px solid #1E221F;border-radius:10px;padding:20px;margin-bottom:16px">
             <div style="font-weight:600;margin-bottom:6px;color:#1D9E75">💳 Transactions</div>
-            <div style="color:#9A9C99;font-size:14px;line-height:1.6">Log every purchase. Choose Budgeted for planned spending, Off-budget for surprises, Free Spend for fun money, Gas or Groceries to auto-track those bills.</div>
+            <div style="color:#9A9C99;font-size:14px;line-height:1.6">Log every purchase. Choose Budgeted for planned spending, Off-budget for surprises, Discretionary for fun money, Gas or Groceries to auto-track those bills.</div>
           </div>
           <div style="background:#101310;border:0.5px solid #1E221F;border-radius:10px;padding:20px;margin-bottom:24px">
             <div style="font-weight:600;margin-bottom:6px;color:#1D9E75">🎯 Goals / Debts</div>
