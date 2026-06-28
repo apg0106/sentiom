@@ -676,7 +676,7 @@ function renderBills(){
   document.getElementById('bills-list').innerHTML=sorted.map(function(b){return'<div class="bill-grid">'+
     '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;color:#E8E8E6">'+
     '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
-    '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" oninput="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
+    '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" onchange="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
     '<button onclick="deleteBill(\''+b.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0">x</button>'+
   '</div>'}).join('');
   document.getElementById('bills-est-total').textContent=fmt(bills.reduce(function(s,b){return s+b.est},0));
@@ -697,6 +697,11 @@ async function addTx(){
     transactions.unshift(tx);
     // Auto-update bill actual if bill category selected
     if(bill){
+      var existingTx=transactions.filter(function(t){return t.bill_id===bill.id});
+      if(existingTx.length>0){
+        var total=existingTx.reduce(function(s,t){return s+t.amount},0);
+        if(!confirm('You already have '+existingTx.length+' transaction(s) totaling '+fmt(total)+' for '+bill.name+'. Log another?'))return;
+      }
       var newActual=parseFloat(((billActuals[bill.id]||0)+a).toFixed(2));
       billActuals[bill.id]=newActual;
       await api('/bill-actuals','POST',{id:bill.id+'-'+mKey(),bill_id:bill.id,month_key:mKey(),actual:newActual})
