@@ -867,6 +867,57 @@ async function addTx(){
     showToast('Transaction logged');renderAll()
   }catch(e){showToast('Could not save',true)}
 }
+function editTxType(id,el){
+  var t=transactions.find(function(t){return t.id===id});
+  if(!t)return;
+  var select=document.createElement('select');
+  select.className='inp-sm';
+  select.style.fontSize='11px';
+  select.style.padding='2px 4px';
+  // Add off-budget
+  var opt=document.createElement('option');
+  opt.value='off-budget';opt.textContent='Off-budget';
+  if(t.type==='off-budget')opt.selected=true;
+  select.appendChild(opt);
+  // Add all bills
+  bills.forEach(function(b){
+    var o=document.createElement('option');
+    o.value=b.id;o.textContent=b.name;
+    if(t.bill_id===b.id)o.selected=true;
+    select.appendChild(o);
+  });
+  select.onchange=function(){updateTxType(id,this.value);};
+  select.onblur=function(){renderTx();};
+  el.parentNode.replaceChild(select,el);
+  select.focus();
+}
+async function updateTxType(id,newVal){
+  var t=transactions.find(function(t){return t.id===id});
+  if(!t)return;
+  var oldBillId=t.bill_id;
+  var newBill=newVal==='off-budget'?null:bills.find(function(b){return b.id===newVal});
+  // Reverse old bill actual
+  if(oldBillId){
+    var oldBill=bills.find(function(b){return b.id===oldBillId});
+    if(oldBill){
+      var newAct=Math.max(0,parseFloat(((billActuals[oldBill.id]||0)-t.amount).toFixed(2)));
+      billActuals[oldBill.id]=newAct;
+      await api('/bill-actuals','POST',{id:oldBill.id+'-'+mKey(),bill_id:oldBill.id,month_key:mKey(),actual:newAct});
+    }
+  }
+  // Update transaction
+  t.type=newVal==='off-budget'?'off-budget':newVal;
+  t.bill_id=newBill?newBill.id:null;
+  await api('/transactions/'+id,'DELETE');
+  await api('/transactions','POST',{id:t.id,merchant:t.merchant,amount:t.amount,date:t.date,type:t.type,bill_id:t.bill_id,logged_by:t.logged_by,month_key:t.month_key});
+  // Apply new bill actual
+  if(newBill){
+    var newAct2=parseFloat(((billActuals[newBill.id]||0)+t.amount).toFixed(2));
+    billActuals[newBill.id]=newAct2;
+    await api('/bill-actuals','POST',{id:newBill.id+'-'+mKey(),bill_id:newBill.id,month_key:mKey(),actual:newAct2});
+  }
+  showToast('Updated');renderAll();
+}
 async function deleteTx(id){
   try{
     var tx=transactions.find(function(t){return t.id===id});
@@ -903,12 +954,12 @@ function renderTx(){
     transactions.map(function(t){
       var badgeClass=t.type==='off-budget'?'badge-o':'badge-b';
       var bill=t.bill_id?bills.find(function(b){return b.id===t.bill_id}):null;
-      var badgeStyle=t.type==='off-budget'?'':'background:#0A2018;color:#1D9E75';
+      var badgeStyle=t.type==='off-budget'?'cursor:pointer':'background:#0A2018;color:#1D9E75;cursor:pointer';
       var badgeText=t.type==='off-budget'?'Off-budget':bill?bill.name:t.type==='discretionary'?'Discretionary':t.type;
       return'<div style="display:grid;grid-template-columns:1fr 65px 90px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
         '<span style="font-size:12px">'+t.merchant+'</span>'+
         '<span style="font-weight:500">'+fmtD(t.amount)+'</span>'+
-        '<span><span class="'+badgeClass+'" style="'+badgeStyle+'">'+badgeText+'</span></span>'+
+        '<span><span class="'+badgeClass+'" style="'+badgeStyle+'" onclick="editTxType(''+t.id+'',this)">'+badgeText+'</span></span>'+
         '<span style="color:#9A9C99;font-size:11px">'+t.logged_by+'</span>'+
         '<button onclick="deleteTx(\''+t.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px">x</button>'+
       '</div>'}).join('');
