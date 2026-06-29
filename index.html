@@ -501,7 +501,7 @@ function renderAll(){renderDash();renderIncome();renderBills();renderTx();render
 function renderDash(){
   var totalInc=incomeLog.reduce(function(s,i){return s+i.amount},0);
   var estBills=bills.reduce(function(s,b){return s+b.est},0);
-  var actBills=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est)},0);
+  var actBills=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:0)},0);
   var billsPaid=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:0)},0);
   var offAmt=transactions.filter(function(t){return t.type==='off-budget'}).reduce(function(s,t){return s+t.amount},0);
   var budAmt=transactions.filter(function(t){return t.type==='budgeted'}).reduce(function(s,t){return s+t.amount},0);
@@ -534,7 +534,7 @@ function renderDash(){
 
   var cats={};
   bills.forEach(function(b){
-    var a=billActuals[b.id]!==undefined?billActuals[b.id]:b.est;
+    var a=billActuals[b.id]!==undefined?billActuals[b.id]:0;
     if(!cats[b.cat])cats[b.cat]={est:0,act:0};
     cats[b.cat].est+=b.est;cats[b.cat].act+=a
   });
@@ -830,11 +830,11 @@ function renderBills(){
     '<span draggable="true" data-id="'+b.id+'" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)" style="color:#6B6D69;cursor:grab;font-size:16px;text-align:center;padding:4px;touch-action:none">&#8942;</span>'+
     '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;color:#E8E8E6">'+
     '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
-    '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" onchange="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right;color:'+(billActuals[b.id]!==undefined&&billActuals[b.id]>b.est?'#E24B4A':'#E8E8E6')+'">'+
+    '<input class="inp-sm" type="number" placeholder="0" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" onchange="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right;color:'+(billActuals[b.id]!==undefined&&billActuals[b.id]>b.est?'#E24B4A':'#E8E8E6')+'">'+
     (b.name==='Monthly Discretionary'?'<span style="width:14px;display:inline-block"></span>':'<button onclick="deleteBill(\''+b.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px;padding:0">x</button>')+
   '</div>'}).join('');
   document.getElementById('bills-est-total').textContent=fmt(bills.reduce(function(s,b){return s+b.est},0));
-  document.getElementById('bills-act-total').textContent=fmt(bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:b.est)},0))
+  document.getElementById('bills-act-total').textContent=fmt(bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:0)},0))
 }
 
 async function addTx(){
