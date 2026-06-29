@@ -11,7 +11,7 @@
 <title>Sentiom</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:#0F1110;color:#E8E8E6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;overscroll-behavior:none}
+html,body{height:100%;height:-webkit-fill-available;background:#0F1110;color:#E8E8E6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;overscroll-behavior:none}
 .app{display:flex;flex-direction:column;height:100vh;max-width:700px;margin:0 auto}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid #1E221F;flex-shrink:0;background:#0F1110;position:sticky;top:0;z-index:10}
 .logo{font-size:20px;font-weight:600;letter-spacing:-0.5px}.logo span{color:#1D9E75}
@@ -711,12 +711,17 @@ async function touchEnd(e){
   // Find target by checking each row's bounding rect
   var rows=document.querySelectorAll('.bill-grid');
   var targetId=null;
+  var closest=999,closestId=null;
   rows.forEach(function(row){
     var rect=row.getBoundingClientRect();
+    var mid=rect.top+(rect.height/2);
+    var dist=Math.abs(y-mid);
+    if(dist<closest){closest=dist;closestId=row.dataset.id;}
     if(y>=rect.top&&y<=rect.bottom){
       targetId=row.dataset.id;
     }
   });
+  if(!targetId)targetId=closestId;
   if(targetId&&targetId!==touchSrcId){
     var srcIdx=bills.findIndex(function(b){return b.id===touchSrcId});
     var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
