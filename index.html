@@ -959,7 +959,7 @@ function renderTx(){
       return'<div style="display:grid;grid-template-columns:1fr 65px 90px 50px 20px;gap:6px;font-size:13px;padding:6px 0;border-bottom:0.5px solid #1A1D1B;align-items:center">'+
         '<span style="font-size:12px">'+t.merchant+'</span>'+
         '<span style="font-weight:500">'+fmtD(t.amount)+'</span>'+
-        '<span><span class="'+badgeClass+'" style="'+badgeStyle+'" onclick="editTxType(''+t.id+'',this)">'+badgeText+'</span></span>'+
+        '<span><span class="'+badgeClass+'" style="'+badgeStyle+'" onclick="editTxType(\''+t.id+'\'',this)">'+badgeText+'</span></span>'+
         '<span style="color:#9A9C99;font-size:11px">'+t.logged_by+'</span>'+
         '<button onclick="deleteTx(\''+t.id+'\')" style="background:none;border:none;cursor:pointer;color:#6B6D69;font-size:14px">x</button>'+
       '</div>'}).join('');
