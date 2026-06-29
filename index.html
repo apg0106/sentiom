@@ -818,8 +818,8 @@ async function updateBillActual(id,val){
 }
 function renderBills(){
   var sorted=[].concat(bills).sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0)});
-  document.getElementById('bills-list').innerHTML=sorted.map(function(b,idx){return'<div class="bill-grid" draggable="true" data-id="'+b.id+'" data-idx="'+idx+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropBill(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">'+
-    '<span style="color:#3A3D3B;cursor:grab;font-size:14px;text-align:center">&#8942;</span>'+
+  document.getElementById('bills-list').innerHTML=sorted.map(function(b,idx){return'<div class="bill-grid" data-id="'+b.id+'" data-idx="'+idx+'" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropBill(event)">'+
+    '<span draggable="true" data-id="'+b.id+'" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)" style="color:#6B6D69;cursor:grab;font-size:16px;text-align:center;padding:4px;touch-action:none">&#8942;</span>'+
     '<input class="inp-sm" value="'+b.name+'" onchange="updateBillName(\''+b.id+'\',this.value)" style="font-size:12px;color:#E8E8E6">'+
     '<input class="inp-sm" type="number" value="'+b.est+'" onchange="updateBillEst(\''+b.id+'\',this.value)" style="width:100%;text-align:right">'+
     '<input class="inp-sm" type="number" placeholder="'+b.est+'" value="'+(billActuals[b.id]!==undefined?billActuals[b.id]:'')+'" onchange="updateBillActual(\''+b.id+'\',this.value)" style="width:100%;text-align:right;color:'+(billActuals[b.id]!==undefined&&billActuals[b.id]>b.est?'#E24B4A':'#E8E8E6')+'">'+
