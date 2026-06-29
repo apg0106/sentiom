@@ -708,10 +708,15 @@ async function touchEnd(e){
     el.style.borderTop='';
   });
   var y=e.changedTouches[0].clientY;
-  var x=e.changedTouches[0].clientX;
-  var target=document.elementFromPoint(x,y);
-  var targetRow=target?target.closest('.bill-grid'):null;
-  var targetId=targetRow?targetRow.dataset.id:null;
+  // Find target by checking each row's bounding rect
+  var rows=document.querySelectorAll('.bill-grid');
+  var targetId=null;
+  rows.forEach(function(row){
+    var rect=row.getBoundingClientRect();
+    if(y>=rect.top&&y<=rect.bottom){
+      targetId=row.dataset.id;
+    }
+  });
   if(targetId&&targetId!==touchSrcId){
     var srcIdx=bills.findIndex(function(b){return b.id===touchSrcId});
     var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
