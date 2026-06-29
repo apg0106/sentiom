@@ -788,7 +788,7 @@ async function updateBillActual(id,val){
   }
   // Check for existing transaction for this bill this month
   var existing=transactions.filter(function(t){return t.bill_id===id});
-  if(existing.length>0){
+  if(existing.length>0&&v>0){
     var total=existing.reduce(function(s,t){return s+t.amount},0);
     if(!confirm('You already have '+existing.length+' transaction(s) totaling '+fmt(total)+' logged for this bill. Add a separate actual anyway?'))return;
   }
@@ -804,13 +804,20 @@ async function updateBillActual(id,val){
         await api('/transactions','POST',tx);
         transactions.unshift(tx);
       } else {
-        // Transaction exists - update its amount
-        var existing=existingTx[0];
-        await api('/transactions/'+existing.id,'DELETE');
-        var updated={id:uid(),merchant:existing.merchant,amount:v,date:existing.date,type:existing.type,bill_id:existing.bill_id,logged_by:USER_NAME,month_key:mKey()};
-        await api('/transactions','POST',updated);
-        transactions=transactions.filter(function(t){return t.bill_id!==id});
-        transactions.unshift(updated);
+        // Transaction exists
+        if(v===0){
+          // Clear actual - delete the transaction
+          await api('/transactions/'+existingTx[0].id,'DELETE');
+          transactions=transactions.filter(function(t){return t.bill_id!==id});
+        } else {
+          // Update transaction amount
+          var existing=existingTx[0];
+          await api('/transactions/'+existing.id,'DELETE');
+          var updated={id:uid(),merchant:existing.merchant,amount:v,date:existing.date,type:existing.type,bill_id:existing.bill_id,logged_by:USER_NAME,month_key:mKey()};
+          await api('/transactions','POST',updated);
+          transactions=transactions.filter(function(t){return t.bill_id!==id});
+          transactions.unshift(updated);
+        }
       }
     }
     renderAll()
