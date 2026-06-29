@@ -505,7 +505,8 @@ function renderDash(){
   var billsPaid=bills.reduce(function(s,b){return s+(billActuals[b.id]!==undefined?billActuals[b.id]:0)},0);
   var offAmt=transactions.filter(function(t){return t.type==='off-budget'}).reduce(function(s,t){return s+t.amount},0);
   var budAmt=transactions.filter(function(t){return t.type==='budgeted'}).reduce(function(s,t){return s+t.amount},0);
-  var freeAmt=transactions.filter(function(t){return t.type==='discretionary'}).reduce(function(s,t){return s+t.amount},0);
+  var discBill=bills.find(function(b){return b.name==='Monthly Discretionary'});
+  var freeAmt=transactions.filter(function(t){return t.bill_id===(discBill?discBill.id:null)||t.type==='discretionary'}).reduce(function(s,t){return s+t.amount},0);
   var gasAmt=transactions.filter(function(t){return t.type==='gas'}).reduce(function(s,t){return s+t.amount},0);
   var grocAmt=transactions.filter(function(t){return t.type==='groceries'}).reduce(function(s,t){return s+t.amount},0);
   var allTx=offAmt+budAmt+freeAmt+gasAmt+grocAmt;
