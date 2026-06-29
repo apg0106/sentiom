@@ -706,49 +706,56 @@ function touchStart(e){
   touchClone.style.top=src.getBoundingClientRect().top+'px';
   document.body.appendChild(touchClone);
 }
+var touchInsertBefore=true;
 function touchMove(e){
   e.preventDefault();
   if(!touchClone)return;
   var y=e.touches[0].clientY;
   touchClone.style.top=(y-20)+'px';
-  // Highlight target row
-  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.borderTop='';});
-  var target=document.elementFromPoint(e.touches[0].clientX,y);
-  var targetRow=target?target.closest('.bill-grid'):null;
-  if(targetRow&&targetRow.dataset.id!==touchSrcId){
-    targetRow.style.borderTop='2px solid #1D9E75';
-  }
+  document.querySelectorAll('.bill-grid').forEach(function(el){el.style.borderTop='';el.style.borderBottom='';});
+  var rows=document.querySelectorAll('.bill-grid');
+  rows.forEach(function(row){
+    var rect=row.getBoundingClientRect();
+    if(y>=rect.top&&y<=rect.bottom&&row.dataset.id!==touchSrcId){
+      var midY=rect.top+(rect.height/2);
+      if(y<midY){
+        row.style.borderTop='2px solid #1D9E75';
+        touchInsertBefore=true;
+      } else {
+        row.style.borderBottom='2px solid #1D9E75';
+        touchInsertBefore=false;
+      }
+      touchSrcId_target=row.dataset.id;
+    }
+  });
 }
 async function touchEnd(e){
   if(touchClone){document.body.removeChild(touchClone);touchClone=null;}
   document.querySelectorAll('.bill-grid').forEach(function(el){
     el.style.opacity='1';
     el.style.borderTop='';
+    el.style.borderBottom='';
   });
   var y=e.changedTouches[0].clientY;
-  // Find target by checking each row's bounding rect
   var rows=document.querySelectorAll('.bill-grid');
   var targetId=null;
-  var closest=999,closestId=null;
   rows.forEach(function(row){
     var rect=row.getBoundingClientRect();
-    var mid=rect.top+(rect.height/2);
-    var dist=Math.abs(y-mid);
-    if(dist<closest){closest=dist;closestId=row.dataset.id;}
-    if(y>=rect.top&&y<=rect.bottom){
+    if(y>=rect.top&&y<=rect.bottom&&row.dataset.id!==touchSrcId){
       targetId=row.dataset.id;
     }
   });
-  if(!targetId)targetId=closestId;
   if(targetId&&targetId!==touchSrcId){
     var srcIdx=bills.findIndex(function(b){return b.id===touchSrcId});
-    var tgtIdx=bills.findIndex(function(b){return b.id===targetId});
-    if(srcIdx>-1&&tgtIdx>-1){
-      var moved=bills.splice(srcIdx,1)[0];
-      bills.splice(tgtIdx,0,moved);
-      await saveBillOrder();
-      renderBills();
+    var moved=bills.splice(srcIdx,1)[0];
+    var newTgtIdx=bills.findIndex(function(b){return b.id===targetId});
+    if(touchInsertBefore){
+      bills.splice(newTgtIdx,0,moved);
+    } else {
+      bills.splice(newTgtIdx+1,0,moved);
     }
+    await saveBillOrder();
+    renderBills();
   }
   touchSrcId=null;
 }
